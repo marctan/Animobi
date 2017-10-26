@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".StreamAnime" />
+        <activity android:name=".StreamAnime"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppFullScreenTheme"/>
         <activity android:name=".EpisodeList"></activity>
     </application>
 

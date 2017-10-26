@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
     AnimeListAdapter animeAdapter;
     ProgressBar pb;
     List<AnimeList> anime_list = null;
+    String animeName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +49,10 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
         new getAnimeList().execute(animeListUrl);
     }
 
-    public void showVid(View v){
-        Intent i = new Intent(this, StreamAnime.class);
-        startActivity(i);
-    }
-
     @Override
     public void onItemClick(int position) {
         AnimeList animeSelected = anime_list.get(position);
+        animeName = animeSelected.getAnimeName();
         new getAnimeEpisode().execute(animeSelected);
         //Toast.makeText(this, anime_list.get(position).getAnimeLink(), Toast.LENGTH_LONG).show();
     }
@@ -128,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
 
             Intent i = new Intent(MainActivity.this, EpisodeList.class);
             i.putExtra("episode_lists", episodes);
+            i.putExtra("animename", animeName);
             startActivity(i);
         }
     }
