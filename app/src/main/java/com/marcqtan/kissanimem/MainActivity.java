@@ -8,11 +8,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,12 +18,8 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static android.R.id.list;
-import static android.R.id.message;
 
 public class MainActivity extends AppCompatActivity implements AnimeListAdapter.OnItemClicked {
 
@@ -99,33 +92,43 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
         }
     }
 
-    private class getAnimeEpisode extends AsyncTask<AnimeList, Void, ArrayList<String>> {
+    private class getAnimeEpisode extends AsyncTask<AnimeList, Void, ArrayList<Map.Entry<String,String>>> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            pb.setVisibility(View.VISIBLE);
         }
 
         @Override
-        protected ArrayList<String> doInBackground(AnimeList... params) {
+        protected ArrayList<Map.Entry<String,String>> doInBackground(AnimeList... params) {
             AnimeList animeSelected = params[0];
             try {
                 Document doc = Jsoup.connect(animeSelected.getAnimeLink()).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                         .followRedirects(true)
                         .get();
                 parseAnimeEpisode(animeSelected, doc);
+                return animeSelected.retrieveEpisodes();
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.v("getAnimeEpisode()", "Error accessing link");
+                return null;
             }
-            //return params[0].retrieveEpisodes();
-            return null;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<String> strings) {
-            super.onPostExecute(strings);
-            //Log.v("episode", Arrays.toString(strings.toArray()));
+        protected void onPostExecute(ArrayList<Map.Entry<String,String>> episodes) {
+            super.onPostExecute(episodes);
+            pb.setVisibility(View.GONE);
+
+            if(episodes == null) {
+                Log.v("getAnimeEpisode()", "ERROR on postExecute!!!");
+                return;
+            }
+
+            Intent i = new Intent(MainActivity.this, EpisodeList.class);
+            i.putExtra("episode_lists", episodes);
+            startActivity(i);
         }
     }
 
@@ -167,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
                 anime.addEpisodeInfo(episode_name_link);
             }
 
-            //Log.v("test", anime.retrieveEpisodes().get(0).getValue().toString());
+            //Log.v("test", anime.retrieveEpisodes().get(0).getKey().toString());
 
         } catch (IOException e) {
             e.printStackTrace();

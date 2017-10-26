@@ -12,7 +12,7 @@ public class AnimeList {
 
     private String m_animeName;
     private String m_animeLink;
-    private List<Map.Entry<String,String>> m_episodeList;
+    private ArrayList<Map.Entry<String,String>> m_episodeList;
 
     public String getAnimeName() {
         return m_animeName;
@@ -34,7 +34,7 @@ public class AnimeList {
         m_episodeList.add(episode);
     }
 
-    public List<Map.Entry<String,String>> retrieveEpisodes () {
+    public ArrayList<Map.Entry<String,String>> retrieveEpisodes () {
         return m_episodeList;
     }
 
