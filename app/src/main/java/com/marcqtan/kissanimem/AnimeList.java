@@ -1,7 +1,6 @@
 package com.marcqtan.kissanimem;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,6 +11,7 @@ public class AnimeList {
 
     private String m_animeName;
     private String m_animeLink;
+    private String m_thumbnail;
     private ArrayList<Map.Entry<String,String>> m_episodeList;
 
     public String getAnimeName() {
@@ -22,8 +22,16 @@ public class AnimeList {
         m_animeName = animename;
     }
 
+    public void setThumbNail(String image){
+        m_thumbnail = image;
+    }
+
     public String getAnimeLink() {
         return m_animeLink;
+    }
+
+    public String getAnimeThumbnail() {
+        return m_thumbnail;
     }
 
     public void setAnimeLink(String animelink){

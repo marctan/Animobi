@@ -3,10 +3,6 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
     android:background="?android:attr/selectableItemBackground"
     >
 
@@ -19,12 +15,13 @@
         android:fontFamily="monospace"
         android:textColor="#000"
         android:textSize="20sp"
+        android:padding="16dp"
         tools:text="Ep 1" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#dadada"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp" />
+        android:layout_marginTop="2dp"
+        android:background="?android:attr/listDivider"/>
+
 </LinearLayout>

@@ -1,15 +1,16 @@
 package com.marcqtan.kissanimem;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,8 +18,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter.onItemClicked {
@@ -26,6 +27,8 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
     RecyclerView episode_list;
     EpisodeListAdapter epadapter;
     ArrayList<Map.Entry<String, String>> lists_episode;
+
+    List<String> ep_names = null;
     ProgressBar pb;
     String episodeName = null;
     String animeName = null;
@@ -60,7 +63,7 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
         //Toast.makeText(this,"LINK IS " + lists_episode.get(position).getValue(), Toast.LENGTH_SHORT).show();
     }
 
-    public class getAnimeVideo extends AsyncTask<String, Void, String> {
+    public class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -68,7 +71,7 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected List<String> doInBackground(String... params) {
             try {
                 Document doc = Jsoup.connect(params[0]).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                         .followRedirects(true)
@@ -82,14 +85,36 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
         }
 
         @Override
-        protected void onPostExecute(String url) {
-            super.onPostExecute(url);
+        protected void onPostExecute(List<String> quality) {
+            super.onPostExecute(quality);
             pb.setVisibility(View.GONE);
-            if(url == null) {
-                Log.v("Error", "Error fetching video url");
+            if(quality == null) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(EpisodeList.this);
+                adb.setTitle("No available video stream");
+                adb.setMessage("Sorry");
+                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish(); // take out user from this activity. you can skip this
+                    }
+                });
+                AlertDialog ad = adb.create();
+                ad.show();
+
+                Log.v("Error", "Error fetching video quality url");
+            } else if (quality.size() == 1) {
+
+                Intent i = new Intent(EpisodeList.this, exoactivity.class);
+                i.putExtra("vidurl", quality.get(0));
+                i.putExtra("episodeName", episodeName);
+                i.putExtra("animeName", animeName);
+                startActivity(i);
+
             } else {
-                Intent i = new Intent(EpisodeList.this, StreamAnime.class);
-                i.putExtra("vidurl", url);
+                Intent i = new Intent(EpisodeList.this, QualityList.class);
+                i.putStringArrayListExtra("vidurl", (ArrayList<String>)quality);
+                i.putStringArrayListExtra("ep_name", (ArrayList<String>) ep_names);
                 i.putExtra("episodeName", episodeName);
                 i.putExtra("animeName", animeName);
                 startActivity(i);
@@ -97,28 +122,37 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
         }
     }
 
-    private String getVideoLink(Document doc) {
-        Elements el = doc.select("div.play-video").select("iframe[src]");
-        String vidUrl = "https:" + el.attr("src");
-        String vidDirectUrl = null;
+    private List<String> getVideoLink(Document doc) {
         try {
-            Document doc2 = Jsoup.connect(vidUrl).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
+            String vidDirectUrl = doc.select("div#Rapidvideo").select("iframe[src]").attr("src");
+
+            if(vidDirectUrl == "") {
+                return null;
+            }
+
+            vidDirectUrl = "https://otakustream.tv" + vidDirectUrl;
+            Document doc2 = Jsoup.connect(vidDirectUrl).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
+                    .followRedirects(true)
+                    .get();
+            vidDirectUrl = doc2.select("iframe[src]").attr("src");
+
+            Document doc3 = Jsoup.connect(vidDirectUrl).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                     .followRedirects(true)
                     .get();
 
-            Elements vidPlayer = doc2.select("video#my-video-player");
-            for(Element vidSource : vidPlayer.select("source")){
-                if(vidSource.select("source[label]").attr("label").toString().equals("360")) {
-                    vidDirectUrl = vidSource.select("source[src]").attr("src");
-                } else if (vidSource.select("source[label]").attr("label").toString().equals("480")) {
-                    vidDirectUrl = vidSource.select("source[src]").attr("src");
-                }
+            Elements a = doc3.select("a"); //select all quality
+            List<String> quality = new ArrayList<String>();
+            if(a.size() <= 1) {
+                quality.add(doc3.select("video#videojs").select("source[src]").attr("src"));
+                return quality;
+            }
+            ep_names = new ArrayList<>();
+            for(Element x:a) {
+                quality.add(x.select("a[href]").attr("href"));
+                ep_names.add(x.text());
             }
 
-            if(vidDirectUrl == null) { //if there's no 360 or 480
-                vidDirectUrl = vidPlayer.select("source").select("source[src]").attr("src");
-            }
-            return vidDirectUrl;
+            return quality;
 
         } catch (IOException e) {
             e.printStackTrace();

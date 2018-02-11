@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.marcqtan.kissanimem">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -18,10 +18,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".StreamAnime"
+        <activity
+            android:name=".exoactivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppFullScreenTheme"/>
-        <activity android:name=".EpisodeList"></activity>
+            android:theme="@style/AppFullScreenTheme" />
+        <activity android:name=".EpisodeList" />
+        <activity android:name=".QualityList" />
     </application>
 
 </manifest>
