@@ -7,7 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ProgressBar;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -17,19 +17,19 @@ import java.io.IOException;
 import java.util.List;
 
 public class SearchList extends AppCompatActivity implements SearchListAdapter.onItemClicked {
-    ProgressBar pb;
     List <AnimeList> animeLists = null;
     RecyclerView rv;
     SearchListAdapter adapter;
     TextView empty;
+    FrameLayout frame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_list);
-        pb = findViewById(R.id.progressBar);
         rv = findViewById(R.id.searchRv);
         empty = findViewById(R.id.empty_view);
+        frame = findViewById(R.id.progressBarContainer);
         adapter = new SearchListAdapter(this,this);
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -46,9 +46,9 @@ public class SearchList extends AppCompatActivity implements SearchListAdapter.o
     public void itemClick(int position) {
         AnimeList animeSelected = animeLists.get(position);
         if(animeSelected.getEpisodeCount().equals("Movie")) {
-            new Utility.getAnimeVideo(pb, this, animeSelected.getAnimeName(), "").execute(animeSelected.getAnimeLink());
+            new Utility.getAnimeVideo(this, animeSelected.getAnimeName(), "",frame).execute(animeSelected.getAnimeLink());
          } else {
-            new Utility.getAnimeEpisode(pb, this, animeSelected.getAnimeName()).execute(animeSelected);
+            new Utility.getAnimeEpisode(this, animeSelected.getAnimeName(), frame).execute(animeSelected);
         }
     }
 
@@ -56,7 +56,7 @@ public class SearchList extends AppCompatActivity implements SearchListAdapter.o
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pb.setVisibility(View.VISIBLE);
+            frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -85,7 +85,7 @@ public class SearchList extends AppCompatActivity implements SearchListAdapter.o
                 empty.setVisibility(View.GONE);
                 adapter.setData(animeLists);
             }
-            pb.setVisibility(View.GONE);
+            frame.setVisibility(View.GONE);
         }
     }
 

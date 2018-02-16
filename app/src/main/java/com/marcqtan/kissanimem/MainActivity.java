@@ -13,8 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 
@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
     String animeTrendingUrl = "https://otakustream.tv/trending-animes";
 
     AnimeListAdapter animeAdapter;
-    ProgressBar pb;
     List<AnimeList> anime_list = null;
     EditText query;
+    FrameLayout frame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
         Utility.initCollapsingToolbar((CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar),(AppBarLayout)findViewById(R.id.appbar), getString(R.string.app_name));
 
         animelist = (RecyclerView) findViewById(R.id.animelist);
-        pb = (ProgressBar)findViewById(R.id.progressBar);
         animeAdapter = new AnimeListAdapter(this, this);
         query = findViewById(R.id.searchET);
+        frame = findViewById(R.id.progressBarContainer);
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         animelist.setLayoutManager(layoutManager);
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
     @Override
     public void onItemClick(int position) {
         AnimeList animeSelected = anime_list.get(position);
-        new Utility.getAnimeEpisode(pb, this, animeSelected.getAnimeName()).execute(animeSelected);
+        new Utility.getAnimeEpisode(this, animeSelected.getAnimeName(), frame).execute(animeSelected);
     }
 
     public void search(View view) {
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pb.setVisibility(View.VISIBLE);
+            frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
             } else {
                 Log.v("ERROR HERE", "ERROR!!!");
             }
-            pb.setVisibility(View.GONE);
+            frame.setVisibility(View.GONE);
         }
     }
 

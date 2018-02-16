@@ -1,6 +1,5 @@
 package com.marcqtan.kissanimem;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -9,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -37,22 +38,16 @@ import com.google.android.exoplayer2.util.Util;
 public class exoactivity extends AppCompatActivity implements ExoPlayer.EventListener {
     SimpleExoPlayer player;
     String path;        // it can be url of video for online streaming or a url of local video
-    ProgressDialog pDialog;
+    RelativeLayout relativelayout_progress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exoactivity);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        relativelayout_progress = findViewById(R.id.relativelayout_progress);
         // set your path here
         path=getIntent().getStringExtra("vidurl");
-        pDialog = new ProgressDialog(exoactivity.this);
-        pDialog.setTitle(getIntent().getStringExtra("episodeName") + " " + getIntent().getStringExtra("animeName"));
-        // Set progressbar message
-        pDialog.setMessage("Buffering...");
-        pDialog.setIndeterminate(false);
-        pDialog.setCancelable(true);
-
 
         // 1. Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -115,14 +110,14 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
             case ExoPlayer.STATE_BUFFERING:
                 //You can use progress dialog to show user that video is preparing or buffering so please wait
                 // Show progressbar
-                pDialog.show();
+                relativelayout_progress.setVisibility(View.VISIBLE);
                 break;
             case ExoPlayer.STATE_IDLE:
                 //idle state
                 break;
             case ExoPlayer.STATE_READY:
                 // dismiss your dialog here because our video is ready to play now
-                pDialog.dismiss();
+                relativelayout_progress.setVisibility(View.GONE);
                 break;
             case ExoPlayer.STATE_ENDED:
                 // do your processing after ending of video
@@ -133,7 +128,7 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         // show user that something went wrong. I am showing dialog but you can use your way
-        pDialog.dismiss();
+        relativelayout_progress.setVisibility(View.GONE);
         AlertDialog.Builder adb = new AlertDialog.Builder(exoactivity.this);
         adb.setTitle("Could not stream video");
         adb.setMessage("Please try again.");

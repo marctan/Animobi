@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
 
     RecyclerView episode_list;
     EpisodeListAdapter epadapter;
+    FrameLayout frame;
     ArrayList<Map.Entry<String, String>> lists_episode;
 
-    ProgressBar pb;
     String episodeName = null;
     String animeName = null;
 
@@ -25,7 +26,7 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
         setContentView(R.layout.activity_episode_list);
 
         episode_list = (RecyclerView) findViewById(R.id.episodeRV);
-        pb = (ProgressBar) findViewById(R.id.progressBar);
+        frame = findViewById(R.id.progressBarContainer);
 
         LinearLayoutManager lm = new LinearLayoutManager(this);
 
@@ -45,7 +46,7 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
     public void onClick(int position) {
         String episodeUrl = lists_episode.get(position).getValue();
         episodeName = lists_episode.get(position).getKey();
-        new Utility.getAnimeVideo(pb, this, animeName, episodeName).execute(episodeUrl);
+        new Utility.getAnimeVideo(this, animeName, episodeName, frame).execute(episodeUrl);
         //Toast.makeText(this,"LINK IS " + lists_episode.get(position).getValue(), Toast.LENGTH_SHORT).show();
     }
 }

@@ -8,8 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +20,8 @@ import java.util.List;
 
 public class QualityList extends AppCompatActivity {
     ListView listView;
-    ProgressBar pb;
+    FrameLayout frame;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +29,7 @@ public class QualityList extends AppCompatActivity {
         final List<String> quality = getIntent().getStringArrayListExtra("vidurl");
         ArrayList<String> ep_name = getIntent().getStringArrayListExtra("ep_name");
         listView = (ListView) findViewById(R.id.list);
-        pb = (ProgressBar) findViewById(R.id.progressBar);
+        frame = findViewById(R.id.progressBarContainer);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, ep_name);
@@ -54,7 +55,7 @@ public class QualityList extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pb.setVisibility(View.VISIBLE);
+            frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -74,7 +75,7 @@ public class QualityList extends AppCompatActivity {
         @Override
         protected void onPostExecute(String video) {
             super.onPostExecute(video);
-            pb.setVisibility(View.GONE);
+            frame.setVisibility(View.GONE);
             if(video == null) {
                 Log.v("Error", "Error fetching video quality url");
             } else {

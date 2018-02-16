@@ -13,7 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.widget.ProgressBar;
+import android.widget.FrameLayout;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -123,20 +123,20 @@ public final class Utility {
     }
 
     public static class getAnimeEpisode extends AsyncTask<AnimeList, Void, ArrayList<Map.Entry<String,String>>> {
-        ProgressBar pb;
         Context context;
         String animeName;
+        FrameLayout frame;
 
-        getAnimeEpisode(ProgressBar pb, Context context, String animeName) {
-            this.pb = pb;
+        getAnimeEpisode(Context context, String animeName, FrameLayout frame) {
             this.context = context;
             this.animeName = animeName;
+            this.frame = frame;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pb.setVisibility(View.VISIBLE);
+            frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -158,7 +158,7 @@ public final class Utility {
         @Override
         protected void onPostExecute(ArrayList<Map.Entry<String,String>> episodes) {
             super.onPostExecute(episodes);
-            pb.setVisibility(View.GONE);
+            frame.setVisibility(View.GONE);
 
             if(episodes == null) {
                 Log.v("getAnimeEpisode()", "ERROR on postExecute!!!");
@@ -188,24 +188,24 @@ public final class Utility {
     }
 
     public static class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
-        ProgressBar pb;
         Context context;
         List<String> ep_names = new ArrayList<String>();
         String name;
         String episode;
+        FrameLayout frame;
 
-        public getAnimeVideo(ProgressBar pb, Context context, String name, String episode) {
-            this.pb = pb;
+        public getAnimeVideo(Context context, String name, String episode, FrameLayout frame) {
             this.context = context;
             this.ep_names = ep_names;
             this.episode = episode;
             this.name = name;
+            this.frame = frame;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pb.setVisibility(View.VISIBLE);
+            frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -225,7 +225,7 @@ public final class Utility {
         @Override
         protected void onPostExecute(List<String> quality) {
             super.onPostExecute(quality);
-            pb.setVisibility(View.GONE);
+            frame.setVisibility(View.GONE);
             if(quality == null) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(context);
                 adb.setTitle("No available video stream");
