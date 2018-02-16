@@ -135,8 +135,8 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
         // show user that something went wrong. I am showing dialog but you can use your way
         pDialog.dismiss();
         AlertDialog.Builder adb = new AlertDialog.Builder(exoactivity.this);
-        adb.setTitle("Could not able to stream video");
-        adb.setMessage("It seems that something is going wrong.\nPlease try again.");
+        adb.setTitle("Could not stream video");
+        adb.setMessage("Please try again.");
         adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

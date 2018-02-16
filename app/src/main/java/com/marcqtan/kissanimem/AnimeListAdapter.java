@@ -46,6 +46,7 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
     public void onBindViewHolder(AnimeViewHolder holder, int position) {
         AnimeList anime = animeLists.get(position);
         holder.tvAnimeName.setText(anime.getAnimeName());
+        holder.tvEpisodeCount.setText(anime.getEpisodeCount());
         Glide.with(mContext).load(anime.getAnimeThumbnail()).into(holder.thumbNail);
 
         /*holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -80,12 +81,15 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
 
         TextView tvAnimeName;
         ImageView thumbNail;
+        TextView tvEpisodeCount;
+
         public CardView cardView;
         public AnimeViewHolder(View v) {
             super(v);
             tvAnimeName = (TextView) v.findViewById(R.id.anime_name);
             thumbNail = (ImageView) v.findViewById(R.id.thumbnail);
             cardView = (CardView) v.findViewById(R.id.card_view);
+            tvEpisodeCount = v.findViewById(R.id.ep_count);
             v.setOnClickListener(this);
         }
 

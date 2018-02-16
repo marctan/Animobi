@@ -49,7 +49,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:id="@+id/linearLayout2">
 
                     <TextView
                         android:id="@+id/love_music"
@@ -67,6 +68,26 @@
                         android:textSize="18sp" />-->
 
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:onClick="search"
+                    android:text="Search" />
+
+                <EditText
+                    android:id="@+id/searchET"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toLeftOf="@+id/search"
+                    android:layout_toStartOf="@+id/search"
+                    android:ems="6"
+                     />
             </RelativeLayout>
 
             <android.support.v7.widget.Toolbar
