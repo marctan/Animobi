@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -28,6 +29,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -39,6 +41,7 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
     SimpleExoPlayer player;
     String path;        // it can be url of video for online streaming or a url of local video
     RelativeLayout relativelayout_progress;
+    TextView title;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +49,7 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
         setContentView(R.layout.activity_exoactivity);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         relativelayout_progress = findViewById(R.id.relativelayout_progress);
+        title = findViewById(R.id.title);
         // set your path here
         path=getIntent().getStringExtra("vidurl");
 
@@ -60,10 +64,16 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
         LoadControl loadControl = new DefaultLoadControl();
         // 3. Create the player
         player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-
+        title.setText(getIntent().getStringExtra("animeName"));
         SimpleExoPlayerView playerView = (SimpleExoPlayerView) findViewById(R.id.player_view);
         playerView.setPlayer(player);
         playerView.setKeepScreenOn(true);
+        playerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
+            @Override
+            public void onVisibilityChange(int visibility) {
+                title.setVisibility(visibility);
+            }
+        });
         // Produces DataSource instances through which media data is loaded.
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "ExoPlayer"));
 
@@ -78,6 +88,7 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
         player.prepare(videoSource);
         playerView.requestFocus();
         player.setPlayWhenReady(true);      // to play video when ready. Use false to pause a video
+
     }
 
 
