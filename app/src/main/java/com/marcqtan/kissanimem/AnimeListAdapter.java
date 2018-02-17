@@ -19,7 +19,7 @@ import java.util.List;
 
 public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.AnimeViewHolder> {
 
-    List<AnimeList> animeLists;
+    private List<Anime> animeLists;
     private OnItemClicked mListener;
     private Context mContext;
 
@@ -28,7 +28,7 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
         void onItemClick(int position);
     }
 
-    public AnimeListAdapter(OnItemClicked listener, Context mContext) {
+    AnimeListAdapter(OnItemClicked listener, Context mContext) {
         this.mContext = mContext;
         mListener = listener;
     }
@@ -37,14 +37,13 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
     public AnimeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater li = LayoutInflater.from(parent.getContext());
         View view = li.inflate(R.layout.cardviewlayout, parent, false);
-        AnimeViewHolder vh = new AnimeViewHolder(view);
 
-        return vh;
+        return new AnimeViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(AnimeViewHolder holder, int position) {
-        AnimeList anime = animeLists.get(position);
+        Anime anime = animeLists.get(position);
         holder.tvAnimeName.setText(anime.getAnimeName());
         holder.tvEpisodeCount.setText(anime.getEpisodeCount());
         Glide.with(mContext).load(anime.getAnimeThumbnail()).into(holder.thumbNail);
@@ -72,7 +71,7 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
         return animeLists.size();
     }
 
-    public void setAnimeData(List<AnimeList> animeLists) {
+    void setAnimeData(List<Anime> animeLists) {
         this.animeLists = animeLists;
         notifyDataSetChanged();
     }
@@ -83,12 +82,12 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
         ImageView thumbNail;
         TextView tvEpisodeCount;
 
-        public CardView cardView;
-        public AnimeViewHolder(View v) {
+        CardView cardView;
+        AnimeViewHolder(View v) {
             super(v);
-            tvAnimeName = (TextView) v.findViewById(R.id.anime_name);
-            thumbNail = (ImageView) v.findViewById(R.id.thumbnail);
-            cardView = (CardView) v.findViewById(R.id.card_view);
+            tvAnimeName = v.findViewById(R.id.anime_name);
+            thumbNail = v.findViewById(R.id.thumbnail);
+            cardView = v.findViewById(R.id.card_view);
             tvEpisodeCount = v.findViewById(R.id.ep_count);
             v.setOnClickListener(this);
         }

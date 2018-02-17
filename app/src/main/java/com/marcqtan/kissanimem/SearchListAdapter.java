@@ -18,7 +18,7 @@ import java.util.List;
 
 public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.ViewHolder> {
 
-    private List<AnimeList> anime_list = null;
+    private List<Anime> anime_list = null;
     private Context m_context;
     private onItemClicked m_listener;
 
@@ -33,7 +33,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
 
     @Override
     public void onBindViewHolder(SearchListAdapter.ViewHolder holder, int position) {
-        AnimeList anime = anime_list.get(position);
+        Anime anime = anime_list.get(position);
         holder.title.setText(anime.getAnimeName());
         holder.epcount.setText(anime.getEpisodeCount());
         Glide.with(m_context).load(anime.getAnimeThumbnail()).into(holder.thumbnail);
@@ -52,7 +52,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
         this.m_listener = m_listener;
     }
 
-    public void setData(List<AnimeList> list){
+    public void setData(List<Anime> list){
         anime_list = list;
         notifyDataSetChanged();
     }

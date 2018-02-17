@@ -1,6 +1,5 @@
 package com.marcqtan.kissanimem;
 
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,7 @@ public class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.
 
     @Override
     public void onBindViewHolder(EpisodeViewHolder holder, int position) {
-        holder.episode_list.setText(m_episodes.get(position).getKey().toString());
+        holder.episode_list.setText(m_episodes.get(position).getKey());
     }
 
     @Override
@@ -42,16 +41,16 @@ public class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.
         return m_episodes.size();
     }
 
-    public EpisodeListAdapter(ArrayList<Map.Entry<String, String>> episodes, onItemClicked listener) {
+    EpisodeListAdapter(ArrayList<Map.Entry<String, String>> episodes, onItemClicked listener) {
         m_episodes = episodes;
         m_listener = listener;
     }
 
     public class EpisodeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView episode_list;
-        public EpisodeViewHolder(View itemView) {
+        EpisodeViewHolder(View itemView) {
             super(itemView);
-            episode_list = (TextView)itemView.findViewById(R.id.tv_episode_list);
+            episode_list = itemView.findViewById(R.id.tv_episode_list);
             itemView.setOnClickListener(this);
         }
 

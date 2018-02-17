@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class SearchList extends AppCompatActivity implements SearchListAdapter.onItemClicked {
-    List <AnimeList> animeLists = null;
+    List <Anime> animeLists = null;
     RecyclerView rv;
     SearchListAdapter adapter;
     TextView empty;
@@ -44,11 +44,11 @@ public class SearchList extends AppCompatActivity implements SearchListAdapter.o
 
     @Override
     public void itemClick(int position) {
-        AnimeList animeSelected = animeLists.get(position);
+        Anime animeSelected = animeLists.get(position);
         if(animeSelected.getEpisodeCount().equals("Movie")) {
-            new Utility.getAnimeVideo(this, animeSelected.getAnimeName(), "",frame).execute(animeSelected.getAnimeLink());
+            new Utility.getAnimeVideo(this, animeSelected, frame).execute(animeSelected.getAnimeLink());
          } else {
-            new Utility.getAnimeEpisode(this, animeSelected.getAnimeName(), frame).execute(animeSelected);
+            new Utility.getAnimeEpisode(this, frame).execute(animeSelected);
         }
     }
 

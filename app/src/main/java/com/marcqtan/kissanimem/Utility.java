@@ -30,7 +30,7 @@ import java.util.Map;
  * Created by dell on 13/02/2018.
  */
 
-public final class Utility {
+final class Utility {
 
     public static class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -71,20 +71,19 @@ public final class Utility {
      * Converting dp to pixel
      */
     static int dpToPx(int dp, Resources resource) {
-        Resources r = resource;
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resource.getDisplayMetrics()));
     }
 
-    static List<AnimeList> parseAllAnimeName(Document doc) {
+    static List<Anime> parseAllAnimeName(Document doc) {
         Elements animeInfo = doc.select("div.ep-box");
-        List<AnimeList> animelist;
+        List<Anime> animelist;
 
         if (animeInfo.size() ==0){
             return null;
         }
         animelist = new ArrayList<>();
         for(Element info : animeInfo ){
-            AnimeList anime = new AnimeList();
+            Anime anime = new Anime();
             Element hrefInfo = info.select("a").first();
             anime.setAnimeName(hrefInfo.text());
             anime.setAnimeLink(hrefInfo.attr("href"));
@@ -98,11 +97,10 @@ public final class Utility {
     static void initCollapsingToolbar(CollapsingToolbarLayout toolbarlayout, AppBarLayout appbarlayout, final String appname) {
         final CollapsingToolbarLayout collapsingToolbar = toolbarlayout;
         collapsingToolbar.setTitle(" ");
-        AppBarLayout appBarLayout = appbarlayout;
-        appBarLayout.setExpanded(true);
+        appbarlayout.setExpanded(true);
 
         // hiding & showing the title when toolbar expanded & collapsed
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+        appbarlayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
             int scrollRange = -1;
 
@@ -122,14 +120,12 @@ public final class Utility {
         });
     }
 
-    public static class getAnimeEpisode extends AsyncTask<AnimeList, Void, ArrayList<Map.Entry<String,String>>> {
+    public static class getAnimeEpisode extends AsyncTask<Anime, Void, Anime> {
         Context context;
-        String animeName;
         FrameLayout frame;
 
-        getAnimeEpisode(Context context, String animeName, FrameLayout frame) {
+        getAnimeEpisode(Context context, FrameLayout frame) {
             this.context = context;
-            this.animeName = animeName;
             this.frame = frame;
         }
 
@@ -140,14 +136,14 @@ public final class Utility {
         }
 
         @Override
-        protected ArrayList<Map.Entry<String,String>> doInBackground(AnimeList... params) {
-            AnimeList animeSelected = params[0];
+        protected Anime doInBackground(Anime... params) {
+            Anime animeSelected = params[0];
             try {
                 Document doc = Jsoup.connect(animeSelected.getAnimeLink()).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                         .followRedirects(true)
                         .get();
                 parseAnimeEpisode(animeSelected, doc);
-                return animeSelected.retrieveEpisodes();
+                return animeSelected;
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.v("getAnimeEpisode()", "Error accessing link");
@@ -156,23 +152,22 @@ public final class Utility {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Map.Entry<String,String>> episodes) {
-            super.onPostExecute(episodes);
+        protected void onPostExecute(Anime anime) {
+            super.onPostExecute(anime);
             frame.setVisibility(View.GONE);
 
-            if(episodes == null) {
+            if(anime.retrieveEpisodes() == null) {
                 Log.v("getAnimeEpisode()", "ERROR on postExecute!!!");
                 return;
             }
 
             Intent i = new Intent(context, EpisodeList.class);
-            i.putExtra("episode_lists", episodes);
-            i.putExtra("animename", animeName);
+            i.putExtra("anime", anime);
             context.startActivity(i);
         }
     }
 
-    private static void parseAnimeEpisode(AnimeList anime, Document doc) {
+    private static void parseAnimeEpisode(Anime anime, Document doc) {
         String episode_list = doc.select("div.ep-list").select("a").get(0).text();
         int latestEpisode = Integer.parseInt(episode_list.substring(8));
 
@@ -185,20 +180,18 @@ public final class Utility {
 
             anime.addEpisodeInfo(episode_name_link);
         }
+        anime.setSummary(doc.select("div.some-more-info").select("p").text());
     }
 
     public static class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
         Context context;
         List<String> ep_names = new ArrayList<String>();
-        String name;
-        String episode;
+        Anime anime;
         FrameLayout frame;
 
-        public getAnimeVideo(Context context, String name, String episode, FrameLayout frame) {
+        public getAnimeVideo(Context context, Anime anime, FrameLayout frame) {
             this.context = context;
-            this.ep_names = ep_names;
-            this.episode = episode;
-            this.name = name;
+            this.anime = anime;
             this.frame = frame;
         }
 
@@ -226,6 +219,7 @@ public final class Utility {
         protected void onPostExecute(List<String> quality) {
             super.onPostExecute(quality);
             frame.setVisibility(View.GONE);
+
             if(quality == null) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(context);
                 adb.setTitle("No available video stream");
@@ -244,16 +238,14 @@ public final class Utility {
 
                 Intent i = new Intent(context, exoactivity.class);
                 i.putExtra("vidurl", quality.get(0));
-                i.putExtra("episodeName", episode);
-                i.putExtra("animeName", name);
+                i.putExtra("animeName", anime.getAnimeName());
                 context.startActivity(i);
 
             } else {
                 Intent i = new Intent(context, QualityList.class);
                 i.putStringArrayListExtra("vidurl", (ArrayList<String>)quality);
                 i.putStringArrayListExtra("ep_name", (ArrayList<String>) ep_names);
-                i.putExtra("episodeName", episode);
-                i.putExtra("animeName", name);
+                i.putExtra("animeName", anime.getAnimeName());
                 context.startActivity(i);
             }
         }

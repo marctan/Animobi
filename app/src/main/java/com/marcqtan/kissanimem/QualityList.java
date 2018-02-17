@@ -28,7 +28,7 @@ public class QualityList extends AppCompatActivity {
         setContentView(R.layout.activity_quality_list);
         final List<String> quality = getIntent().getStringArrayListExtra("vidurl");
         ArrayList<String> ep_name = getIntent().getStringArrayListExtra("ep_name");
-        listView = (ListView) findViewById(R.id.list);
+        listView = findViewById(R.id.list);
         frame = findViewById(R.id.progressBarContainer);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -81,7 +81,6 @@ public class QualityList extends AppCompatActivity {
             } else {
                 Intent i = new Intent(QualityList.this, exoactivity.class);
                 i.putExtra("vidurl", video);
-                i.putExtra("episodeName", getIntent().getStringExtra("episodeName"));
                 i.putExtra("animeName", getIntent().getStringExtra("animeName"));
                 startActivity(i);
             }

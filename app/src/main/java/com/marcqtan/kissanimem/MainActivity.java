@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
     String animeTrendingUrl = "https://otakustream.tv/trending-animes";
 
     AnimeListAdapter animeAdapter;
-    List<AnimeList> anime_list = null;
+    List<Anime> anime_list = null;
     EditText query;
     FrameLayout frame;
 
@@ -42,11 +42,11 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Utility.initCollapsingToolbar((CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar),(AppBarLayout)findViewById(R.id.appbar), getString(R.string.app_name));
 
-        animelist = (RecyclerView) findViewById(R.id.animelist);
+        animelist = findViewById(R.id.animelist);
         animeAdapter = new AnimeListAdapter(this, this);
         query = findViewById(R.id.searchET);
         frame = findViewById(R.id.progressBarContainer);
@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
 
     @Override
     public void onItemClick(int position) {
-        AnimeList animeSelected = anime_list.get(position);
-        new Utility.getAnimeEpisode(this, animeSelected.getAnimeName(), frame).execute(animeSelected);
+        Anime animeSelected = anime_list.get(position);
+        new Utility.getAnimeEpisode(this, frame).execute(animeSelected);
     }
 
     public void search(View view) {
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements AnimeListAdapter.
     public void parseTrendingAnimeName(Document doc) {
         Elements animeInfo = doc.select("article.article-block");
         for(Element info : animeInfo ){
-            AnimeList anime = new AnimeList();
+            Anime anime = new Anime();
             Element hrefInfo = info.select("h3").first();
             anime.setAnimeName(hrefInfo.text());
             anime.setAnimeLink(hrefInfo.select("a").attr("href"));

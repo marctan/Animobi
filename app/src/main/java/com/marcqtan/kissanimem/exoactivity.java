@@ -65,7 +65,7 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
         // 3. Create the player
         player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
         title.setText(getIntent().getStringExtra("animeName"));
-        SimpleExoPlayerView playerView = (SimpleExoPlayerView) findViewById(R.id.player_view);
+        SimpleExoPlayerView playerView = findViewById(R.id.player_view);
         playerView.setPlayer(player);
         playerView.setKeepScreenOn(true);
         playerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {

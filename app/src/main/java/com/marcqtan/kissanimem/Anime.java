@@ -1,5 +1,6 @@
 package com.marcqtan.kissanimem;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -7,16 +8,24 @@ import java.util.Map;
  * Created by dell on 25/10/2017.
  */
 
-class AnimeList {
+class Anime implements Serializable {
 
     private String m_animeName;
     private String m_animeLink;
     private String m_thumbnail;
     private ArrayList<Map.Entry<String,String>> m_episodeList;
     private String m_episode_count;
+    private String m_summary;
 
     String getAnimeName() {
         return m_animeName;
+    }
+    String getSummary() {
+        return m_summary;
+    }
+
+    void setSummary(String summary) {
+        this.m_summary = summary;
     }
 
     void setAnimeName(String animename){
