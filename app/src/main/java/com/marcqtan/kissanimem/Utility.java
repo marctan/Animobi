@@ -1,19 +1,22 @@
 package com.marcqtan.kissanimem;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -183,75 +186,7 @@ final class Utility {
         anime.setSummary(doc.select("div.some-more-info").select("p").text());
     }
 
-    public static class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
-        Context context;
-        List<String> ep_names = new ArrayList<String>();
-        Anime anime;
-        FrameLayout frame;
-
-        public getAnimeVideo(Context context, Anime anime, FrameLayout frame) {
-            this.context = context;
-            this.anime = anime;
-            this.frame = frame;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected List<String> doInBackground(String... params) {
-            try {
-                Document doc = Jsoup.connect(params[0]).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
-                        .followRedirects(true)
-                        .get();
-                return Utility.getVideoLink(doc, ep_names);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.v("getAnimeEpisode()", "Error accessing link");
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<String> quality) {
-            super.onPostExecute(quality);
-            frame.setVisibility(View.GONE);
-
-            if(quality == null) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(context);
-                adb.setTitle("No available video stream");
-                adb.setMessage("Sorry");
-                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog ad = adb.create();
-                ad.show();
-
-                Log.v("Error", "Error fetching video quality url");
-            } else if (quality.size() == 1) {
-
-                Intent i = new Intent(context, exoactivity.class);
-                i.putExtra("vidurl", quality.get(0));
-                i.putExtra("animeName", anime.getAnimeName());
-                context.startActivity(i);
-
-            } else {
-                Intent i = new Intent(context, QualityList.class);
-                i.putStringArrayListExtra("vidurl", (ArrayList<String>)quality);
-                i.putStringArrayListExtra("ep_name", (ArrayList<String>) ep_names);
-                i.putExtra("animeName", anime.getAnimeName());
-                context.startActivity(i);
-            }
-        }
-    }
-
-    static List<String> getVideoLink(Document doc, List<String> ep_names) {
+    static List<String> getQuality(Document doc, List<String> quality_name) {
         try {
             String vidDirectUrl = doc.select("div#Rapidvideo").select("iframe[src]").attr("src");
 
@@ -276,11 +211,10 @@ final class Utility {
                 return quality;
             }
 
-            for(Element x:a) {
+            for (Element x : a) {
                 quality.add(x.select("a[href]").attr("href"));
-                ep_names.add(x.text());
+                quality_name.add(x.text());
             }
-
             return quality;
 
         } catch (IOException e) {
@@ -288,5 +222,78 @@ final class Utility {
             Log.v("getAnimeEpisode()", "Error accessing link");
             return null;
         }
+    }
+    public static class getVideo extends AsyncTask<String, Void, String> {
+        FrameLayout frame;
+        Context context;
+        String animeName;
+
+        getVideo(Context context, FrameLayout frame, String animeName) {
+            this.frame = frame;
+            this.context = context;
+            this.animeName = animeName;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            frame.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Document doc = Jsoup.connect(params[0]).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
+                        .followRedirects(true)
+                        .get();
+                return getVideoLink(doc);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.v("getAnimeEpisode()", "Error accessing link");
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String video) {
+            super.onPostExecute(video);
+            frame.setVisibility(View.GONE);
+            if(video == null) {
+                Log.v("Error", "Error fetching video quality url");
+            } else {
+                Intent i = new Intent(context, exoactivity.class);
+                i.putExtra("vidurl", video);
+                i.putExtra("animeName", animeName);
+                context.startActivity(i);
+            }
+        }
+    }
+
+    private static String getVideoLink(Document doc) {
+        return doc.select("video#videojs").select("source[src]").attr("src");
+    }
+
+    public static void showBottomSheet(final Context context, Activity a, ListView list, final List<String> quality_list, List<String> quality_name, final FrameLayout frame, final String animeName){
+        final BottomSheetDialog dialog = new BottomSheetDialog(context);
+        View parentView = a.getLayoutInflater().inflate(R.layout.bottom_sheet_layout,null);
+        dialog.setContentView(parentView);
+        list = dialog.findViewById(R.id.list);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
+                R.layout.custom_list_layout, android.R.id.text1, quality_name);
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                dialog.hide();
+                String itemValue = quality_list.get(position);
+                new Utility.getVideo(context, frame, animeName).execute(itemValue);
+
+            }
+        });
+        dialog.show();
     }
 }

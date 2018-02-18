@@ -23,8 +23,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppFullScreenTheme" />
         <activity android:name=".EpisodeList" />
-        <activity android:name=".QualityList" />
-        <activity android:name=".SearchList"></activity>
+        <activity android:name=".SearchList" />
+        <activity android:name=".MovieActivity"></activity>
     </application>
 
 </manifest>

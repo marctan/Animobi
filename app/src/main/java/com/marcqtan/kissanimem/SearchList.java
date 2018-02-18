@@ -1,5 +1,6 @@
 package com.marcqtan.kissanimem;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -46,7 +47,10 @@ public class SearchList extends AppCompatActivity implements SearchListAdapter.o
     public void itemClick(int position) {
         Anime animeSelected = animeLists.get(position);
         if(animeSelected.getEpisodeCount().equals("Movie")) {
-            new Utility.getAnimeVideo(this, animeSelected, frame).execute(animeSelected.getAnimeLink());
+            Intent intent = new Intent(this, MovieActivity.class);
+            intent.putExtra("anime", animeSelected);
+            startActivity(intent);
+            //new Utility.getAnimeVideo(this, animeSelected, frame).execute(animeSelected.getAnimeLink());
          } else {
             new Utility.getAnimeEpisode(this, frame).execute(animeSelected);
         }
