@@ -22,9 +22,9 @@
             android:name=".exoactivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppFullScreenTheme" />
-        <activity android:name=".EpisodeList" />
-        <activity android:name=".SearchList" />
-        <activity android:name=".MovieActivity"></activity>
+        <activity android:name=".EpisodeListFragment" />
+        <activity android:name=".SearchFragment" />
+        <activity android:name=".MovieFragment"></activity>
     </application>
 
 </manifest>

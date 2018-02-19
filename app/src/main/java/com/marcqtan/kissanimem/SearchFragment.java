@@ -1,13 +1,16 @@
 package com.marcqtan.kissanimem;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -17,42 +20,54 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.util.List;
 
-public class SearchList extends AppCompatActivity implements SearchListAdapter.onItemClicked {
+public class SearchFragment extends Fragment implements SearchListAdapter.onItemClicked {
     List <Anime> animeLists = null;
     RecyclerView rv;
     SearchListAdapter adapter;
     TextView empty;
     FrameLayout frame;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_list);
-        rv = findViewById(R.id.searchRv);
-        empty = findViewById(R.id.empty_view);
-        frame = findViewById(R.id.progressBarContainer);
-        adapter = new SearchListAdapter(this,this);
+    public SearchFragment() {
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_search_list, container, false);
+        rv = rootView.findViewById(R.id.searchRv);
+        empty = rootView.findViewById(R.id.empty_view);
+        frame = rootView.findViewById(R.id.progressBarContainer);
+        adapter = new SearchListAdapter(getActivity(), this);
+
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
         rv.setLayoutManager(layoutManager);
         rv.addItemDecoration(new Utility.GridSpacingItemDecoration(2, Utility.dpToPx(10, getResources()), true));
         rv.setItemAnimator(new DefaultItemAnimator());
         rv.setHasFixedSize(true);
         rv.setAdapter(adapter);
+        return rootView;
+    }
 
-        new searchAnime().execute(getIntent().getStringExtra("searchUrl"));
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        new searchAnime().execute(getArguments().getString("searchUrl"));
     }
 
     @Override
     public void itemClick(int position) {
         Anime animeSelected = animeLists.get(position);
         if(animeSelected.getEpisodeCount().equals("Movie")) {
-            Intent intent = new Intent(this, MovieActivity.class);
-            intent.putExtra("anime", animeSelected);
-            startActivity(intent);
-            //new Utility.getAnimeVideo(this, animeSelected, frame).execute(animeSelected.getAnimeLink());
+
+            MovieFragment movieFrag = new MovieFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("anime", animeSelected);
+
+            movieFrag.setArguments(bundle);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, movieFrag).commit();
          } else {
-            new Utility.getAnimeEpisode(this, frame).execute(animeSelected);
+            new Utility.getAnimeEpisode(getActivity(), frame).execute(animeSelected);
         }
     }
 

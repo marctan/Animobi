@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
@@ -124,10 +126,10 @@ final class Utility {
     }
 
     public static class getAnimeEpisode extends AsyncTask<Anime, Void, Anime> {
-        Context context;
+        FragmentActivity context;
         FrameLayout frame;
 
-        getAnimeEpisode(Context context, FrameLayout frame) {
+        getAnimeEpisode(FragmentActivity context, FrameLayout frame) {
             this.context = context;
             this.frame = frame;
         }
@@ -164,9 +166,12 @@ final class Utility {
                 return;
             }
 
-            Intent i = new Intent(context, EpisodeList.class);
-            i.putExtra("anime", anime);
-            context.startActivity(i);
+            EpisodeListFragment episodeList = new EpisodeListFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("anime", anime);
+            episodeList.setArguments(bundle);
+
+            context.getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).commit();
         }
     }
 

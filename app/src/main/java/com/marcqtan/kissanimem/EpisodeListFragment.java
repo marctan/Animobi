@@ -4,15 +4,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter.onItemClicked {
+public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.onItemClicked {
 
     RecyclerView episode_list;
     EpisodeListAdapter epadapter;
@@ -33,31 +38,28 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
     Anime anime;
     ListView list;
 
+
+    public EpisodeListFragment() {
+
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_episode_list);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_episode_list, container, false);
+        episode_list = rootView.findViewById(R.id.episodeRV);
+        frame = rootView.findViewById(R.id.progressBarContainer);
+        summary = rootView.findViewById(R.id.summary);
 
-        episode_list = findViewById(R.id.episodeRV);
-        frame = findViewById(R.id.progressBarContainer);
-        summary = findViewById(R.id.summary);
-
-        Bundle b = getIntent().getExtras();
-        if(b != null) {
-            anime = (Anime) b.getSerializable("anime");
-        }
-
-        if (anime == null) {
-            return;
-        }
+        anime = (Anime) getArguments().getSerializable("anime");
 
         summary.setText(anime.getSummary());
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        Utility.initCollapsingToolbar((CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar),(AppBarLayout)findViewById(R.id.appbar), getString(R.string.app_name));
+        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        Utility.initCollapsingToolbar((CollapsingToolbarLayout)rootView.findViewById(R.id.collapsing_toolbar),(AppBarLayout)rootView.findViewById(R.id.appbar), getString(R.string.app_name));
 
-        LinearLayoutManager lm = new LinearLayoutManager(this);
+        LinearLayoutManager lm = new LinearLayoutManager(getActivity());
 
         episode_list.setLayoutManager(lm);
         episode_list.setHasFixedSize(true);
@@ -65,7 +67,7 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
         epadapter = new EpisodeListAdapter(anime.retrieveEpisodes(), this);
 
         episode_list.setAdapter(epadapter);
-
+        return rootView;
     }
 
     @Override
@@ -105,7 +107,7 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
             frame.setVisibility(View.GONE);
 
             if(quality == null) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(EpisodeList.this);
+                AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
                 adb.setTitle("No available video stream");
                 adb.setMessage("Sorry");
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -120,13 +122,13 @@ public class EpisodeList extends AppCompatActivity implements EpisodeListAdapter
                 Log.v("Error", "Error fetching video quality url");
             } else if (quality.size() == 1) {
 
-                Intent i = new Intent(EpisodeList.this, exoactivity.class);
+                Intent i = new Intent(getActivity(), exoactivity.class);
                 i.putExtra("vidurl", quality.get(0));
                 i.putExtra("animeName", anime.getAnimeName());
                 startActivity(i);
 
             } else {
-                Utility.showBottomSheet(EpisodeList.this, EpisodeList.this, list, quality, quality_name, frame, anime.getAnimeName());
+                Utility.showBottomSheet(getActivity(), getActivity(), list, quality, quality_name, frame, anime.getAnimeName());
             }
         }
     }
