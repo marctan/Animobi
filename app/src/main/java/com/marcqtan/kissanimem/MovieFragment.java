@@ -1,5 +1,7 @@
 package com.marcqtan.kissanimem;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -21,10 +23,11 @@ import android.widget.TextView;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieFragment extends Fragment {
+public class MovieFragment extends Fragment implements Utility.interface2 {
 
     Anime anime;
     TextView summary;
@@ -52,7 +55,7 @@ public class MovieFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        new getMovieInfo().execute(anime.getAnimeLink());
+        new getMovieInfo(this).execute(anime.getAnimeLink());
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,25 +75,55 @@ public class MovieFragment extends Fragment {
                     Log.v("Error", "Error fetching video quality url");
                 } else if (quality_list.size() == 1) {
 
+                    if(getActivity() == null) {
+                        return;
+                    }
+
                     Intent i = new Intent(getActivity(), exoactivity.class);
                     i.putExtra("vidurl", quality_list.get(0));
                     i.putExtra("animeName", anime.getAnimeName());
                     startActivity(i);
 
                 } else {
-                    Utility.showBottomSheet(getActivity(),getActivity(), list, quality_list, quality_name, frame, anime.getAnimeName());
+                    Utility.showBottomSheet(MovieFragment.this, quality_list, quality_name, anime.getAnimeName());
                 }
             }
         });
     }
 
-    class getMovieInfo extends AsyncTask<String, Void, List<String>> {
+    @Override
+    public void showVisibilty() {
+        frame.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideVisibility() {
+        frame.setVisibility(View.GONE);
+    }
+
+    @Override
+    public Context getCtx() {
+        return getActivity();
+    }
+
+    @Override
+    public Activity getActvty() {
+        return getActivity();
+    }
+
+    static class getMovieInfo extends AsyncTask<String, Void, List<String>> {
+
+        private WeakReference<MovieFragment> activity;
+
+        getMovieInfo(MovieFragment activity) {
+            this.activity = new WeakReference<MovieFragment>(activity);
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
-            layout.setVisibility(View.GONE);
+            activity.get().frame.setVisibility(View.VISIBLE);
+            activity.get().layout.setVisibility(View.GONE);
         }
 
         @Override
@@ -100,9 +133,9 @@ public class MovieFragment extends Fragment {
                         .followRedirects(true)
                         .get();
 
-                anime.setSummary(doc.select("div.some-more-info").select("p").text());
+                activity.get().anime.setSummary(doc.select("div.some-more-info").select("p").text());
 
-                return Utility.getQuality(doc, quality_name);
+                return Utility.getQuality(doc, activity.get().quality_name);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.v("getAnimeEpisode()", "Error accessing link");
@@ -113,10 +146,10 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(List<String> quality) {
             super.onPostExecute(quality);
-            frame.setVisibility(View.GONE);
-            summary.setText(anime.getSummary());
-            layout.setVisibility(View.VISIBLE);
-            quality_list = quality;
+            activity.get().frame.setVisibility(View.GONE);
+            activity.get().summary.setText(activity.get().anime.getSummary());
+            activity.get().layout.setVisibility(View.VISIBLE);
+            activity.get().quality_list = quality;
         }
     }
 }

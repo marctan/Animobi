@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +29,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ import java.util.List;
  * Created by dell on 18/02/2018.
  */
 
-public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnItemClicked  {
+public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnItemClicked, Utility.interface1  {
 
     RecyclerView animelist;
     String animeListUrl = "https://otakustream.tv/anime/";
@@ -84,14 +86,36 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        new getAnimeList().execute(animeTrendingUrl);
+        new getAnimeList(this).execute(animeTrendingUrl);
     }
 
-    private class getAnimeList extends AsyncTask<String, Void, Void> {
+    @Override
+    public void showVisibilty() {
+        frame.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideVisibility() {
+        frame.setVisibility(View.GONE);
+    }
+
+    @Override
+    public FragmentActivity getFragActivity() {
+        return getActivity();
+    }
+
+    private static class getAnimeList extends AsyncTask<String, Void, Void> {
+
+        private WeakReference<MainAnimeFragment> activity;
+
+        getAnimeList(MainAnimeFragment activity){
+            this.activity = new WeakReference<MainAnimeFragment>(activity);
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
+            activity.get().frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -100,15 +124,15 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
                 Document doc = Jsoup.connect(params[0]).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                         .followRedirects(true)
                         .get();
-                anime_list = new ArrayList<>();
-                parseTrendingAnimeName(doc);
+                activity.get().anime_list = new ArrayList<>();
+                activity.get().parseTrendingAnimeName(doc);
                 Elements page = doc.select("div.wp-pagenavi").select("a");
                 for(int i = 0; i < page.size() - 1;i++) {
                     String pageUrl = page.get(i).attr("href");
                     doc = Jsoup.connect(pageUrl).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                             .followRedirects(true)
                             .get();
-                    parseTrendingAnimeName(doc);
+                    activity.get().parseTrendingAnimeName(doc);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -119,12 +143,12 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
-            if(anime_list != null) {
-                animeAdapter.setAnimeData(anime_list);
+            if(activity.get().anime_list != null) {
+                activity.get().animeAdapter.setAnimeData(activity.get().anime_list);
             } else {
                 Log.v("ERROR HERE", "ERROR!!!");
             }
-            frame.setVisibility(View.GONE);
+            activity.get().frame.setVisibility(View.GONE);
         }
     }
 
@@ -144,7 +168,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     @Override
     public void onItemClick(int position) {
         Anime animeSelected = anime_list.get(position);
-        new Utility.getAnimeEpisode(getActivity(), frame).execute(animeSelected);
+        new Utility.getAnimeEpisode(this).execute(animeSelected);
     }
 
 }

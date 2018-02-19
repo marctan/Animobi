@@ -1,5 +1,7 @@
 package com.marcqtan.kissanimem;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,10 +28,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.onItemClicked {
+public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.onItemClicked, Utility.interface2 {
 
     RecyclerView episode_list;
     EpisodeListAdapter epadapter;
@@ -74,17 +77,44 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
     public void onClick(int position) {
         //String episodeUrl = lists_episode.get(position).getValue();
         //String episodeName = lists_episode.get(position).getKey();
-        new getAnimeVideo().execute(anime.retrieveEpisodes().get(position).getValue());
+        new getAnimeVideo(this).execute(anime.retrieveEpisodes().get(position).getValue());
         //Toast.makeText(this,"LINK IS " + lists_episode.get(position).getValue(), Toast.LENGTH_SHORT).show();
     }
 
-    class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
+    @Override
+    public void showVisibilty() {
+        frame.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideVisibility() {
+        frame.setVisibility(View.GONE);
+    }
+
+    @Override
+    public Context getCtx() {
+        return getActivity();
+    }
+
+    @Override
+    public Activity getActvty() {
+        return getActivity();
+    }
+
+
+    static class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
         List<String> quality_name = new ArrayList<String>();
+
+        private WeakReference<EpisodeListFragment> activity;
+
+        getAnimeVideo(EpisodeListFragment activity) {
+            this.activity = new WeakReference<EpisodeListFragment>(activity);
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
+            activity.get().frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -104,10 +134,10 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
         @Override
         protected void onPostExecute(final List<String> quality) {
             super.onPostExecute(quality);
-            frame.setVisibility(View.GONE);
+            activity.get().frame.setVisibility(View.GONE);
 
             if(quality == null) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
+                AlertDialog.Builder adb = new AlertDialog.Builder(activity.get().getActivity());
                 adb.setTitle("No available video stream");
                 adb.setMessage("Sorry");
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -122,13 +152,17 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
                 Log.v("Error", "Error fetching video quality url");
             } else if (quality.size() == 1) {
 
-                Intent i = new Intent(getActivity(), exoactivity.class);
+                if(activity.get().getActivity() == null) {
+                    return;
+                }
+
+                Intent i = new Intent(activity.get().getActivity(), exoactivity.class);
                 i.putExtra("vidurl", quality.get(0));
-                i.putExtra("animeName", anime.getAnimeName());
-                startActivity(i);
+                i.putExtra("animeName", activity.get().anime.getAnimeName());
+                activity.get().startActivity(i);
 
             } else {
-                Utility.showBottomSheet(getActivity(), getActivity(), list, quality, quality_name, frame, anime.getAnimeName());
+                Utility.showBottomSheet(activity.get(), quality, quality_name, activity.get().anime.getAnimeName());
             }
         }
     }

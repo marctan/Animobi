@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,9 +19,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements SearchListAdapter.onItemClicked {
+public class SearchFragment extends Fragment implements SearchListAdapter.onItemClicked, Utility.interface1 {
+
     List <Anime> animeLists = null;
     RecyclerView rv;
     SearchListAdapter adapter;
@@ -52,7 +55,7 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        new searchAnime().execute(getArguments().getString("searchUrl"));
+        new searchAnime(this).execute(getArguments().getString("searchUrl"));
     }
 
     @Override
@@ -67,15 +70,35 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
             movieFrag.setArguments(bundle);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, movieFrag).commit();
          } else {
-            new Utility.getAnimeEpisode(getActivity(), frame).execute(animeSelected);
+            new Utility.getAnimeEpisode(this).execute(animeSelected);
         }
     }
 
-    private class searchAnime extends AsyncTask<String, Void, Void> {
+    @Override
+    public void showVisibilty() {
+        frame.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideVisibility() {
+        frame.setVisibility(View.GONE);
+    }
+
+    @Override
+    public FragmentActivity getFragActivity() {
+        return getActivity();
+    }
+
+    private static class searchAnime extends AsyncTask<String, Void, Void> {
+        private WeakReference<SearchFragment> activity;
+
+        searchAnime(SearchFragment activity) {
+            this.activity = new WeakReference<SearchFragment>(activity);
+        }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
+            activity.get().frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -85,7 +108,7 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
                         .followRedirects(true)
                         .get();
 
-                animeLists = Utility.parseAllAnimeName(doc);
+                activity.get().animeLists = Utility.parseAllAnimeName(doc);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -96,15 +119,15 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(animeLists == null || animeLists.size() <= 0) {
-                rv.setVisibility(View.GONE);
-                empty.setVisibility(View.VISIBLE);
-            }  else if (animeLists.size() > 0){
-                rv.setVisibility(View.VISIBLE);
-                empty.setVisibility(View.GONE);
-                adapter.setData(animeLists);
+            if(activity.get().animeLists == null || activity.get().animeLists.size() <= 0) {
+                activity.get().rv.setVisibility(View.GONE);
+                activity.get().empty.setVisibility(View.VISIBLE);
+            }  else if (activity.get().animeLists.size() > 0){
+                activity.get().rv.setVisibility(View.VISIBLE);
+                activity.get().empty.setVisibility(View.GONE);
+                activity.get().adapter.setData(activity.get().animeLists);
             }
-            frame.setVisibility(View.GONE);
+            activity.get().frame.setVisibility(View.GONE);
         }
     }
 

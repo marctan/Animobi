@@ -17,7 +17,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import org.jsoup.Jsoup;
@@ -126,18 +125,16 @@ final class Utility {
     }
 
     public static class getAnimeEpisode extends AsyncTask<Anime, Void, Anime> {
-        FragmentActivity context;
-        FrameLayout frame;
+        interface1 i;
 
-        getAnimeEpisode(FragmentActivity context, FrameLayout frame) {
-            this.context = context;
-            this.frame = frame;
+        getAnimeEpisode(interface1 i) {
+            this.i = i;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
+            i.showVisibilty();
         }
 
         @Override
@@ -159,7 +156,7 @@ final class Utility {
         @Override
         protected void onPostExecute(Anime anime) {
             super.onPostExecute(anime);
-            frame.setVisibility(View.GONE);
+            i.hideVisibility();
 
             if(anime.retrieveEpisodes() == null) {
                 Log.v("getAnimeEpisode()", "ERROR on postExecute!!!");
@@ -171,7 +168,7 @@ final class Utility {
             bundle.putSerializable("anime", anime);
             episodeList.setArguments(bundle);
 
-            context.getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).commit();
+            i.getFragActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).commit();
         }
     }
 
@@ -195,7 +192,7 @@ final class Utility {
         try {
             String vidDirectUrl = doc.select("div#Rapidvideo").select("iframe[src]").attr("src");
 
-            if(vidDirectUrl == "") {
+            if(vidDirectUrl.isEmpty()) {
                 return null;
             }
 
@@ -229,19 +226,17 @@ final class Utility {
         }
     }
     public static class getVideo extends AsyncTask<String, Void, String> {
-        FrameLayout frame;
-        Context context;
         String animeName;
+        interface2 i;
 
-        getVideo(Context context, FrameLayout frame, String animeName) {
-            this.frame = frame;
-            this.context = context;
+        getVideo(interface2 i, String animeName) {
+            this.i = i;
             this.animeName = animeName;
         }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            frame.setVisibility(View.VISIBLE);
+            i.showVisibilty();
         }
 
         @Override
@@ -261,14 +256,17 @@ final class Utility {
         @Override
         protected void onPostExecute(String video) {
             super.onPostExecute(video);
-            frame.setVisibility(View.GONE);
+            i.hideVisibility();
             if(video == null) {
                 Log.v("Error", "Error fetching video quality url");
             } else {
-                Intent i = new Intent(context, exoactivity.class);
-                i.putExtra("vidurl", video);
-                i.putExtra("animeName", animeName);
-                context.startActivity(i);
+                if(i.getCtx() == null) {
+                    return;
+                }
+                Intent intent = new Intent(i.getCtx(), exoactivity.class);
+                intent.putExtra("vidurl", video);
+                intent.putExtra("animeName", animeName);
+                i.getCtx().startActivity(intent);
             }
         }
     }
@@ -277,13 +275,13 @@ final class Utility {
         return doc.select("video#videojs").select("source[src]").attr("src");
     }
 
-    public static void showBottomSheet(final Context context, Activity a, ListView list, final List<String> quality_list, List<String> quality_name, final FrameLayout frame, final String animeName){
-        final BottomSheetDialog dialog = new BottomSheetDialog(context);
-        View parentView = a.getLayoutInflater().inflate(R.layout.bottom_sheet_layout,null);
+    static void showBottomSheet(final interface2 i, final List<String> quality_list, List<String> quality_name, final String animeName){
+        final BottomSheetDialog dialog = new BottomSheetDialog(i.getCtx());
+        View parentView = i.getActvty().getLayoutInflater().inflate(R.layout.bottom_sheet_layout,null);
         dialog.setContentView(parentView);
-        list = dialog.findViewById(R.id.list);
+        ListView list = dialog.findViewById(R.id.list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(i.getCtx(),
                 R.layout.custom_list_layout, android.R.id.text1, quality_name);
         list.setAdapter(adapter);
 
@@ -295,10 +293,23 @@ final class Utility {
 
                 dialog.hide();
                 String itemValue = quality_list.get(position);
-                new Utility.getVideo(context, frame, animeName).execute(itemValue);
+                new Utility.getVideo(i, animeName).execute(itemValue);
 
             }
         });
         dialog.show();
+    }
+
+    public interface interface1{
+        void showVisibilty();
+        void hideVisibility();
+        FragmentActivity getFragActivity();
+    }
+
+    public interface interface2{
+        void showVisibilty();
+        void hideVisibility();
+        Context getCtx();
+        Activity getActvty();
     }
 }
