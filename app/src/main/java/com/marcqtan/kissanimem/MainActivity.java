@@ -1,5 +1,7 @@
 package com.marcqtan.kissanimem;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -18,6 +20,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_nav);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                R.drawable.cover_trending);
+
+        bottomNavigationView.setItemBackgroundResource(R.color.bottombar);
+
+        /*Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @SuppressWarnings("ResourceType")
+            @Override
+            public void onGenerated(Palette palette) {
+                Palette.Swatch vibrant = palette.getVibrantSwatch();
+                if (vibrant != null) {
+                    Log.v("test", Integer.toHexString(vibrant.getRgb()));//ffe83008
+
+                    bottomNavigationView.setItemBackgroundResource(R.color.bottombar);
+                }
+            }
+        });*/
+
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {

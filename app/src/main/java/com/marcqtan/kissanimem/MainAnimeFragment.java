@@ -1,14 +1,18 @@
 package com.marcqtan.kissanimem;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,9 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-
-import com.bumptech.glide.Glide;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -48,6 +49,10 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     EditText query;
     FrameLayout frame;
 
+    private CollapsingToolbarLayout collapsingToolbar;
+    private AppBarLayout appBarLayout;
+    private Toolbar toolbar;
+
     public MainAnimeFragment() {
         // Required empty public constructor
     }
@@ -56,11 +61,28 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.anime_main_layout, container, false);
+        final BottomNavigationView nv = getActivity().findViewById(R.id.bottom_nav);
 
-        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolbar = rootView.findViewById(R.id.toolbar);
 
-        Utility.initCollapsingToolbar((CollapsingToolbarLayout)rootView.findViewById(R.id.collapsing_toolbar),(AppBarLayout)rootView.findViewById(R.id.appbar), getString(R.string.app_name));
+        //Utility.initCollapsingToolbar((CollapsingToolbarLayout)rootView.findViewById(R.id.collapsing_toolbar),(AppBarLayout)rootView.findViewById(R.id.appbar), getString(R.string.app_name));
+        appBarLayout = rootView.findViewById(R.id.appbar);
+
+        collapsingToolbar = rootView.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle("Trending Anime");
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                R.drawable.cover_trending);
+
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @SuppressWarnings("ResourceType")
+            @Override
+            public void onGenerated(Palette palette) {
+                int vibrantColor = palette.getVibrantColor(R.color.colorPrimary);
+                collapsingToolbar.setContentScrimColor(vibrantColor);
+                collapsingToolbar.setStatusBarScrimColor(R.color.black_trans80);
+            }
+        });
 
         animelist = rootView.findViewById(R.id.animelist);
         animeAdapter = new AnimeListAdapter(this, getActivity());
@@ -74,18 +96,15 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         animelist.setHasFixedSize(true);
         animelist.setAdapter(animeAdapter);
 
-        try {
-            Glide.with(this).load(R.drawable.cover).into((ImageView) rootView.findViewById(R.id.backdrop));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+
         new getAnimeList(this).execute(animeTrendingUrl);
     }
 
