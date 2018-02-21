@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -61,7 +59,6 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.anime_main_layout, container, false);
-        final BottomNavigationView nv = getActivity().findViewById(R.id.bottom_nav);
 
         toolbar = rootView.findViewById(R.id.toolbar);
 
@@ -89,8 +86,9 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         query = rootView.findViewById(R.id.searchET);
         frame = rootView.findViewById(R.id.progressBarContainer);
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
-        animelist.setLayoutManager(layoutManager);
+        //RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        //animelist.setLayoutManager(layoutManager);
+        animelist.setLayoutManager(new ScrollingLinearLayoutManager(getActivity(),2, 1000));
         animelist.addItemDecoration(new Utility.GridSpacingItemDecoration(2, Utility.dpToPx(10, getResources()), true));
         animelist.setItemAnimator(new DefaultItemAnimator());
         animelist.setHasFixedSize(true);
@@ -188,6 +186,10 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     public void onItemClick(int position) {
         Anime animeSelected = anime_list.get(position);
         new Utility.getAnimeEpisode(this).execute(animeSelected);
+    }
+
+    public void scrolltoTop(){
+        animelist.smoothScrollToPosition(0);
     }
 
 }

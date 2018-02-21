@@ -1,7 +1,5 @@
 package com.marcqtan.kissanimem;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -21,8 +19,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_nav);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
-                R.drawable.cover_trending);
+        //Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                //R.drawable.cover_trending);
 
         bottomNavigationView.setItemBackgroundResource(R.color.bottombar);
 
@@ -40,16 +38,23 @@ public class MainActivity extends AppCompatActivity {
         });*/
 
 
+
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.menu_home:
-                                switchFragment(mainAnimeFragment);
+                                Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder);
+                                if (currentFragment instanceof MainAnimeFragment) {
+                                    ((MainAnimeFragment) currentFragment).scrolltoTop();
+                                }
+                                else {
+                                    switchFragment(mainAnimeFragment,"MainFrag");
+                                }
                                 return true;
                             case R.id.menu_search:
-                                switchFragment(searchAnimeFragment);
+                                switchFragment(searchAnimeFragment, "searchFrag");
                                 return true;
                             case R.id.menu_notifications:
                                 //switchFragment(2, TAG_FRAGMENT_TRIPS);
@@ -59,11 +64,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
-        switchFragment(mainAnimeFragment);
+        switchFragment(mainAnimeFragment, "MainFrag");
     }
 
-    private void switchFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, fragment).commit();
+    private void switchFragment(Fragment fragment, String tag) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, fragment, tag).commit();
     }
+
 }
