@@ -44,12 +44,12 @@ public class SearchAnimeFragment extends Fragment {
 
                 String searchUrl = "https://otakustream.tv/?s=" + search.getText();
                 search.getText().clear();
-                SearchFragment searchFrag = new SearchFragment();
+                SearchResultsFragment searchFrag = new SearchResultsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("searchUrl", searchUrl);
 
                 searchFrag.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, searchFrag).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, searchFrag).addToBackStack(null).commit();
             }
         });
     }

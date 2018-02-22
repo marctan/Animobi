@@ -168,7 +168,7 @@ final class Utility {
             bundle.putSerializable("anime", anime);
             episodeList.setArguments(bundle);
 
-            i.getFragActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).commit();
+            i.getFragActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).addToBackStack(null).commit();
         }
     }
 

@@ -88,7 +88,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
 
         //RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
         //animelist.setLayoutManager(layoutManager);
-        animelist.setLayoutManager(new ScrollingLinearLayoutManager(getActivity(),2, 1000));
+        animelist.setLayoutManager(new ScrollingLayoutManager(getActivity(),2, 1000));
         animelist.addItemDecoration(new Utility.GridSpacingItemDecoration(2, Utility.dpToPx(10, getResources()), true));
         animelist.setItemAnimator(new DefaultItemAnimator());
         animelist.setHasFixedSize(true);

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements SearchListAdapter.onItemClicked, Utility.interface1 {
+public class SearchResultsFragment extends Fragment implements SearchListAdapter.onItemClicked, Utility.interface1 {
 
     List <Anime> animeLists = null;
     RecyclerView rv;
@@ -30,7 +30,7 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
     TextView empty;
     FrameLayout frame;
 
-    public SearchFragment() {
+    public SearchResultsFragment() {
 
     }
 
@@ -68,7 +68,7 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
             bundle.putSerializable("anime", animeSelected);
 
             movieFrag.setArguments(bundle);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, movieFrag).commit();
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, movieFrag).addToBackStack(null).commit();
          } else {
             new Utility.getAnimeEpisode(this).execute(animeSelected);
         }
@@ -90,10 +90,10 @@ public class SearchFragment extends Fragment implements SearchListAdapter.onItem
     }
 
     private static class searchAnime extends AsyncTask<String, Void, Void> {
-        private WeakReference<SearchFragment> activity;
+        private WeakReference<SearchResultsFragment> activity;
 
-        searchAnime(SearchFragment activity) {
-            this.activity = new WeakReference<SearchFragment>(activity);
+        searchAnime(SearchResultsFragment activity) {
+            this.activity = new WeakReference<SearchResultsFragment>(activity);
         }
         @Override
         protected void onPreExecute() {

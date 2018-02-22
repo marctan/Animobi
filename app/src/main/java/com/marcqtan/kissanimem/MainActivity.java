@@ -64,7 +64,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        switchFragment(mainAnimeFragment, "MainFrag");
+
+        //CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) bottomNavigationView.getLayoutParams();
+        //layoutParams.setBehavior(new bottombarbehavior());
+
+       switchFragment(mainAnimeFragment, "MainFrag");
     }
 
     private void switchFragment(Fragment fragment, String tag) {

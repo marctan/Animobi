@@ -11,10 +11,10 @@ import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class ScrollingLinearLayoutManager extends GridLayoutManager {
+public class ScrollingLayoutManager extends GridLayoutManager {
     private final int duration;
 
-    public ScrollingLinearLayoutManager(Context context, int span, int duration) {
+    ScrollingLayoutManager(Context context, int span, int duration) {
         super(context, span);
         this.duration = duration;
     }
@@ -39,7 +39,7 @@ public class ScrollingLinearLayoutManager extends GridLayoutManager {
         private final float distanceInPixels;
         private final float duration;
 
-        public SmoothScroller(Context context, int distanceInPixels, int duration) {
+        SmoothScroller(Context context, int distanceInPixels, int duration) {
             super(context);
             this.distanceInPixels = distanceInPixels;
             float millisPerPx = calculateSpeedPerPixel(context.getResources().getDisplayMetrics());
@@ -48,7 +48,7 @@ public class ScrollingLinearLayoutManager extends GridLayoutManager {
 
         @Override
         public PointF computeScrollVectorForPosition(int targetPosition) {
-            return ScrollingLinearLayoutManager.this.computeScrollVectorForPosition(targetPosition);
+            return ScrollingLayoutManager.this.computeScrollVectorForPosition(targetPosition);
         }
 
         @Override
