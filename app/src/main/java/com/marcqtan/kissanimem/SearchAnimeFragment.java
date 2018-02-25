@@ -23,7 +23,7 @@ public class SearchAnimeFragment extends Fragment {
     public SearchAnimeFragment() {
 
     }
-    @Nullable
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.search_anime, container, false);

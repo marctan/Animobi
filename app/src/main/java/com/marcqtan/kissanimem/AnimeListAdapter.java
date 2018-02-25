@@ -1,6 +1,7 @@
 package com.marcqtan.kissanimem;
 
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
 
 
     public interface OnItemClicked {
-        void onItemClick(int position);
+        void onItemClick(int position, ImageView v);
     }
 
     AnimeListAdapter(OnItemClicked listener, Context mContext) {
@@ -46,7 +47,14 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
         Anime anime = animeLists.get(position);
         holder.tvAnimeName.setText(anime.getAnimeName());
         holder.tvEpisodeCount.setText(anime.getEpisodeCount());
-        Glide.with(mContext).load(anime.getAnimeThumbnail()).into(holder.thumbNail);
+        //Glide.with(mContext).load(anime.getAnimeThumbnail()).into(holder.thumbNail);
+        //Glide.with(mContext).load(R.drawable.testcover).into(holder.thumbNail);
+
+        Picasso.with(mContext)
+                .load(anime.getAnimeThumbnail())
+                .into(holder.thumbNail);
+
+        ViewCompat.setTransitionName(holder.thumbNail, anime.getAnimeName());
 
         /*holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,7 +102,7 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
 
         @Override
         public void onClick(View v) {
-            mListener.onItemClick(getAdapterPosition());
+            mListener.onItemClick(getAdapterPosition(), thumbNail);
         }
     }
 

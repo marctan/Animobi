@@ -3,6 +3,7 @@ package com.marcqtan.kissanimem;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,17 +11,20 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,6 +32,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +66,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         View rootView = inflater.inflate(R.layout.anime_main_layout, container, false);
 
         toolbar = rootView.findViewById(R.id.toolbar);
+
 
         //Utility.initCollapsingToolbar((CollapsingToolbarLayout)rootView.findViewById(R.id.collapsing_toolbar),(AppBarLayout)rootView.findViewById(R.id.appbar), getString(R.string.app_name));
         appBarLayout = rootView.findViewById(R.id.appbar);
@@ -100,10 +106,18 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            anime_list = (List<Anime>) savedInstanceState.getSerializable("cacheAnime");
+        } else if (MainActivity.getCacheAnimeList() != null) {
+            anime_list = MainActivity.getCacheAnimeList();
+        }
 
-        new getAnimeList(this).execute(animeTrendingUrl);
+        if(anime_list == null) {
+            new getAnimeList(this).execute(animeTrendingUrl);
+        } else animeAdapter.setAnimeData(MainActivity.getCacheAnimeList());
     }
 
     @Override
@@ -114,6 +128,12 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     @Override
     public void hideVisibility() {
         frame.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable("cacheAnime", (Serializable) anime_list);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -166,6 +186,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
                 Log.v("ERROR HERE", "ERROR!!!");
             }
             activity.get().frame.setVisibility(View.GONE);
+            MainActivity.cacheAnimeList(activity.get().anime_list);
         }
     }
 
@@ -183,9 +204,27 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int position, ImageView image) {
         Anime animeSelected = anime_list.get(position);
-        new Utility.getAnimeEpisode(this).execute(animeSelected);
+
+        EpisodeListFragment episodeList = new EpisodeListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("anime", animeSelected);
+        bundle.putString("transitionName", ViewCompat.getTransitionName(image));
+        episodeList.setArguments(bundle);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            episodeList.setSharedElementEnterTransition(new DetailsTransition());
+            episodeList.setEnterTransition(new Fade());
+            setSharedElementReturnTransition(new DetailsTransition());
+            setExitTransition(new Fade());
+        }
+
+        getActivity().getSupportFragmentManager()
+                .beginTransaction().
+                addSharedElement(image, ViewCompat.getTransitionName(image)).
+                replace(R.id.frame_fragmentholder, episodeList).addToBackStack(null).commit();
+        //new Utility.getAnimeEpisode(this).execute(animeSelected);
     }
 
     public void scrolltoTop(){

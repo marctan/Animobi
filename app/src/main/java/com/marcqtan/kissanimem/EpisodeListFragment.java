@@ -5,11 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +20,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,10 +42,13 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
     RecyclerView episode_list;
     EpisodeListAdapter epadapter;
     FrameLayout frame;
-    TextView summary;
+    //TextView summary;
     Anime anime;
     ListView list;
-
+    ImageView myimage;
+    ProgressBar progress;
+    AppBarLayout appbar;
+    AsyncTask task = null;
 
     public EpisodeListFragment() {
 
@@ -52,15 +60,61 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
         View rootView = inflater.inflate(R.layout.activity_episode_list, container, false);
         episode_list = rootView.findViewById(R.id.episodeRV);
         frame = rootView.findViewById(R.id.progressBarContainer);
-        summary = rootView.findViewById(R.id.summary);
+        //summary = rootView.findViewById(R.id.summary);
+        myimage = rootView.findViewById(R.id.myimage);
+        progress = rootView.findViewById(R.id.progressBar);
+        appbar = rootView.findViewById(R.id.appbar);
 
         anime = (Anime) getArguments().getSerializable("anime");
 
-        summary.setText(anime.getSummary());
+        //summary.setText(anime.getSummary());
 
+
+        if(!getArguments().getString("transitionName").equals("")) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                myimage.setTransitionName(getArguments().getString("transitionName"));
+            }
+
+            /*Glide.with(this)
+                    .load(anime.getAnimeThumbnail())
+                    .dontAnimate()
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            scheduleStartPostponedTransition(myimage);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            scheduleStartPostponedTransition(myimage);
+                            return false;
+                        }
+                    })
+                    .into(myimage);*/
+
+            Picasso.with(getActivity())
+                    .load(anime.getAnimeThumbnail())
+                    .noFade()
+                    //.memoryPolicy(MemoryPolicy.NO_CACHE,MemoryPolicy.NO_STORE)
+                    //.networkPolicy(NetworkPolicy.NO_CACHE)
+                    .into(myimage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    getActivity().supportStartPostponedEnterTransition();
+                                }
+
+                                @Override
+                                public void onError() {
+                                    getActivity().supportStartPostponedEnterTransition();
+                                }
+                    });
+
+        }
         Toolbar toolbar = rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        Utility.initCollapsingToolbar((CollapsingToolbarLayout)rootView.findViewById(R.id.collapsing_toolbar),(AppBarLayout)rootView.findViewById(R.id.appbar), getString(R.string.app_name));
+       // Utility.initCollapsingToolbar((CollapsingToolbarLayout)rootView.findViewById(R.id.collapsing_toolbar),(AppBarLayout)rootView.findViewById(R.id.appbar), getString(R.string.app_name));
 
         LinearLayoutManager lm = new LinearLayoutManager(getActivity());
 
@@ -71,6 +125,43 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
 
         episode_list.setAdapter(epadapter);
         return rootView;
+    }
+
+    private void scheduleStartPostponedTransition(final View sharedElement) {
+        sharedElement.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        sharedElement.getViewTreeObserver().removeOnPreDrawListener(this);
+                        startPostponedEnterTransition();
+                        return true;
+                    }
+                });
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        postponeEnterTransition();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if(anime.retrieveEpisodes() == null) {
+            task = new Utility.getAnimeEpisode(this).execute(anime);
+        } else {
+            epadapter.setEpisodeListData(anime.retrieveEpisodes());
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(task != null) {
+            task.cancel(true);
+        }
     }
 
     @Override

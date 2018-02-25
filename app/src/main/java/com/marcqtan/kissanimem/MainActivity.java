@@ -7,18 +7,29 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     MainAnimeFragment mainAnimeFragment = new MainAnimeFragment();
     SearchAnimeFragment searchAnimeFragment = new SearchAnimeFragment();
 
+    static List<Anime> animeList = null;
+
+    public static void cacheAnimeList(List<Anime> list) {
+        animeList = list;
+    }
+
+    public static List<Anime> getCacheAnimeList(){
+        return animeList;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_nav);
-
         //Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
                 //R.drawable.cover_trending);
 

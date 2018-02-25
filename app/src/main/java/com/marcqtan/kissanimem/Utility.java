@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -17,6 +16,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import org.jsoup.Jsoup;
@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +127,20 @@ final class Utility {
 
     public static class getAnimeEpisode extends AsyncTask<Anime, Void, Anime> {
         interface1 i;
+        ImageView image = null;
+        String name = "";
+        private WeakReference<EpisodeListFragment> activity;
+
+        getAnimeEpisode(interface1 i, ImageView image, String name) {
+            this.i = i;
+            this.image = image;
+            this.name = name;
+        }
+
+        getAnimeEpisode(EpisodeListFragment e){
+            activity = new WeakReference<>(e);
+
+        }
 
         getAnimeEpisode(interface1 i) {
             this.i = i;
@@ -134,7 +149,7 @@ final class Utility {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            i.showVisibilty();
+            activity.get().progress.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -144,6 +159,11 @@ final class Utility {
                 Document doc = Jsoup.connect(animeSelected.getAnimeLink()).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                         .followRedirects(true)
                         .get();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 parseAnimeEpisode(animeSelected, doc);
                 return animeSelected;
             } catch (IOException e) {
@@ -156,19 +176,26 @@ final class Utility {
         @Override
         protected void onPostExecute(Anime anime) {
             super.onPostExecute(anime);
-            i.hideVisibility();
-
+            //i.hideVisibility();
+            activity.get().progress.setVisibility(View.GONE);
             if(anime.retrieveEpisodes() == null) {
                 Log.v("getAnimeEpisode()", "ERROR on postExecute!!!");
                 return;
             }
 
-            EpisodeListFragment episodeList = new EpisodeListFragment();
+            activity.get().epadapter.setEpisodeListData(anime.retrieveEpisodes());
+
+            /*EpisodeListFragment episodeList = new EpisodeListFragment();
             Bundle bundle = new Bundle();
             bundle.putSerializable("anime", anime);
+            bundle.putString("transitionName", name);
             episodeList.setArguments(bundle);
 
-            i.getFragActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).addToBackStack(null).commit();
+            if(name == "") {
+                i.getFragActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder,episodeList).addToBackStack(null).commit();
+            } else {
+                //i.getFragActivity().getSupportFragmentManager().beginTransaction().addSharedElement(image, name).replace(R.id.frame_fragmentholder,episodeList).addToBackStack(null).commit();
+            }*/
         }
     }
 

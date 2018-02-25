@@ -59,4 +59,9 @@ public class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.
             m_listener.onClick(getAdapterPosition());
         }
     }
+
+    void setEpisodeListData(ArrayList<Map.Entry<String, String>> episodes) {
+        this.m_episodes = episodes;
+        notifyDataSetChanged();
+    }
 }
