@@ -73,7 +73,6 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
 
         collapsingToolbar = rootView.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("Trending Anime");
-
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
                 R.drawable.cover_trending);
 
@@ -82,7 +81,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
             @Override
             public void onGenerated(Palette palette) {
                 int vibrantColor = palette.getVibrantColor(R.color.colorPrimary);
-                collapsingToolbar.setContentScrimColor(vibrantColor);
+                //collapsingToolbar.setContentScrimColor(vibrantColor);
                 collapsingToolbar.setStatusBarScrimColor(R.color.black_trans80);
             }
         });

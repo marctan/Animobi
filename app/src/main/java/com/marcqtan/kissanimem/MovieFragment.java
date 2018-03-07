@@ -4,21 +4,31 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.target.ImageViewTarget;
 
 import org.jsoup.Jsoup;
 
@@ -27,16 +37,20 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+
 public class MovieFragment extends Fragment implements Utility.interface2 {
 
     Anime anime;
     TextView summary;
     FrameLayout frame;
-    LinearLayout layout;
     List<String> quality_name = new ArrayList<>();
     ListView list;
     List<String> quality_list;
-    Button play;
+    ImageButton play;
+    ImageView image;
+    NestedScrollView scroll;
+    CollapsingToolbarLayout test;
 
     @Nullable
     @Override
@@ -44,9 +58,50 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
         View rootView = inflater.inflate(R.layout.activity_movie, container,false);
         summary = rootView.findViewById(R.id.summary);
         frame = rootView.findViewById(R.id.progressBarContainer);
-        layout = rootView.findViewById(R.id.layoutContainer);
+        image = rootView.findViewById(R.id.backdrop);
+        //layout = rootView.findViewById(R.id.layoutContainer);
         play = rootView.findViewById(R.id.play);
         anime = (Anime) getArguments().getSerializable("anime");
+        scroll = rootView.findViewById(R.id.scroll);
+        test = rootView.findViewById(R.id.collapsing_toolbar);
+
+        Glide.with(getActivity())
+                .load(anime.getAnimeThumbnail())
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(new ImageViewTarget<GlideDrawable>(image) {
+                    @Override
+                    protected void setResource(GlideDrawable resource) {
+                        setImage(resource);
+                        extractColors(resource);
+                    }
+
+                    private void setImage(GlideDrawable resource) {
+                        image.setImageDrawable(resource.getCurrent());
+                    }
+
+                    private void extractColors(GlideDrawable resource) {
+                        Bitmap b = ((GlideBitmapDrawable) resource.getCurrent()).getBitmap();
+                        Palette p = Palette.from(b).generate();
+
+                        extractBackgroundColor(p);
+                    }
+
+                    private void extractBackgroundColor(Palette p) {
+                        int defaultColor = getActivity().getResources().getColor(R.color.colorPrimary);
+
+
+                        //                        int color = p.getDominantColor(defaultColor);
+                        //                        int color = p.getMutedColor(defaultColor);
+                        //                        int color = p.getLightMutedColor(defaultColor);
+                        //                        int color = p.getDarkMutedColor(defaultColor);
+                        //                        int color = p.getVibrantColor(defaultColor);
+                        //                        int color = p.getLightVibrantColor(defaultColor);
+                        int color = p.getDarkVibrantColor(defaultColor);
+                        scroll.setBackgroundColor(color);
+                        test.setContentScrimColor(color);
+                    }
+                });
+
 
         return rootView;
     }
@@ -55,6 +110,7 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //setupBackdropHeight();
         new getMovieInfo(this).execute(anime.getAnimeLink());
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,7 +179,6 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
         protected void onPreExecute() {
             super.onPreExecute();
             activity.get().frame.setVisibility(View.VISIBLE);
-            activity.get().layout.setVisibility(View.GONE);
         }
 
         @Override
@@ -148,8 +203,19 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
             super.onPostExecute(quality);
             activity.get().frame.setVisibility(View.GONE);
             activity.get().summary.setText(activity.get().anime.getSummary());
-            activity.get().layout.setVisibility(View.VISIBLE);
             activity.get().quality_list = quality;
         }
+    }
+
+    private void setupBackdropHeight() {
+        CollapsingToolbarLayout.LayoutParams params = new CollapsingToolbarLayout.LayoutParams(MATCH_PARENT,
+                getBackdropHeight());
+        params.setCollapseMode(CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX);
+
+        image.setLayoutParams(params);
+    }
+
+    public int getBackdropHeight() {
+        return (int) (getResources().getDisplayMetrics().widthPixels / 1.5f);
     }
 }
