@@ -1,6 +1,7 @@
 package com.marcqtan.kissanimem;
 
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -23,12 +24,12 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
     private onItemClicked m_listener;
 
     public interface onItemClicked {
-        void itemClick(int position);
+        void itemClick(int position, ImageView image);
     }
 
     @Override
     public SearchListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.search_cardview,parent,false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.cardviewlayout,parent,false));
     }
 
     @Override
@@ -36,7 +37,10 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
         Anime anime = anime_list.get(position);
         holder.title.setText(anime.getAnimeName());
         holder.epcount.setText(anime.getEpisodeCount());
-        Glide.with(m_context).load(anime.getAnimeThumbnail()).into(holder.thumbnail);
+        Picasso.with(m_context)
+                .load(anime.getAnimeThumbnail())
+                .into(holder.thumbnail);
+        ViewCompat.setTransitionName(holder.thumbnail, anime.getAnimeName());
     }
 
     @Override
@@ -71,7 +75,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
 
         @Override
         public void onClick(View view) {
-            m_listener.itemClick(getAdapterPosition());
+            m_listener.itemClick(getAdapterPosition(), thumbnail);
         }
     }
 }

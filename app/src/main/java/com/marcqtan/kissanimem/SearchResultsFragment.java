@@ -6,13 +6,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Fade;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -29,6 +32,7 @@ public class SearchResultsFragment extends Fragment implements SearchListAdapter
     SearchListAdapter adapter;
     TextView empty;
     FrameLayout frame;
+    AsyncTask task = null;
 
     public SearchResultsFragment() {
 
@@ -55,22 +59,56 @@ public class SearchResultsFragment extends Fragment implements SearchListAdapter
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        new searchAnime(this).execute(getArguments().getString("searchUrl"));
+        if(animeLists != null && animeLists.size() > 0) {
+            adapter.setData(animeLists);
+        } else {
+            task = new searchAnime(this).execute(getArguments().getString("searchUrl"));
+        }
     }
 
     @Override
-    public void itemClick(int position) {
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(task != null) {
+            task.cancel(true);
+        }
+    }
+    @Override
+    public void itemClick(int position, ImageView image) {
         Anime animeSelected = animeLists.get(position);
         if(animeSelected.getEpisodeCount().equals("Movie")) {
 
             MovieFragment movieFrag = new MovieFragment();
             Bundle bundle = new Bundle();
             bundle.putSerializable("anime", animeSelected);
+            bundle.putString("transitionName", ViewCompat.getTransitionName(image));
 
             movieFrag.setArguments(bundle);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, movieFrag).addToBackStack(null).commit();
+
+            movieFrag.setSharedElementEnterTransition(new DetailsTransition());
+            movieFrag.setEnterTransition(new Fade());
+            setSharedElementReturnTransition(new DetailsTransition());
+            setExitTransition(new Fade());
+
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .addSharedElement(image,ViewCompat.getTransitionName(image))
+                    .replace(R.id.frame_fragmentholder, movieFrag).addToBackStack(null).commit();
          } else {
-            new Utility.getAnimeEpisode(this).execute(animeSelected);
+            EpisodeListFragment episodeList = new EpisodeListFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("anime", animeSelected);
+            bundle.putString("transitionName", ViewCompat.getTransitionName(image));
+            episodeList.setArguments(bundle);
+
+            episodeList.setSharedElementEnterTransition(new DetailsTransition());
+            episodeList.setEnterTransition(new Fade());
+            setSharedElementReturnTransition(new DetailsTransition());
+            setExitTransition(new Fade());
+
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction().
+                    addSharedElement(image, ViewCompat.getTransitionName(image)).
+                    replace(R.id.frame_fragmentholder, episodeList).addToBackStack(null).commit();
         }
     }
 

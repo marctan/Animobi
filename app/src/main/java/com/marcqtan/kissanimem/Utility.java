@@ -207,7 +207,7 @@ final class Utility {
 
         for (int i = 1; i <= latestEpisode; i++) {
             String episode_name = "Episode " + i;
-            String episode_link = anime.getAnimeLink() + "/episode-" + i;
+            String episode_link = anime.getAnimeLink() + "episode-" + i;
             Map.Entry<String, String> episode_name_link = new AbstractMap.SimpleEntry<>(episode_name,episode_link);
 
             anime.addEpisodeInfo(episode_name_link);

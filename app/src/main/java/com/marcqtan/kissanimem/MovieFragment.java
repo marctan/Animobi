@@ -28,7 +28,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 
 import org.jsoup.Jsoup;
 
@@ -37,20 +39,19 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-
 public class MovieFragment extends Fragment implements Utility.interface2 {
 
     Anime anime;
     TextView summary;
     FrameLayout frame;
-    List<String> quality_name = new ArrayList<>();
+    static List<String> quality_name = new ArrayList<>();
     ListView list;
-    List<String> quality_list;
+    static List<String> quality_list;
     ImageButton play;
     ImageView image;
     NestedScrollView scroll;
     CollapsingToolbarLayout test;
+    AsyncTask task = null;
 
     @Nullable
     @Override
@@ -65,9 +66,25 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
         scroll = rootView.findViewById(R.id.scroll);
         test = rootView.findViewById(R.id.collapsing_toolbar);
 
+        image.setTransitionName(getArguments().getString("transitionName"));
+
         Glide.with(getActivity())
                 .load(anime.getAnimeThumbnail())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .dontAnimate()
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        getActivity().startPostponedEnterTransition();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        getActivity().startPostponedEnterTransition();
+                        return false;
+                    }
+                })
                 .into(new ImageViewTarget<GlideDrawable>(image) {
                     @Override
                     protected void setResource(GlideDrawable resource) {
@@ -102,16 +119,43 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
                     }
                 });
 
+        /*Picasso.with(getActivity())
+                .load(anime.getAnimeThumbnail())
+                .noFade()
+                //.memoryPolicy(MemoryPolicy.NO_CACHE,MemoryPolicy.NO_STORE)
+                //.networkPolicy(NetworkPolicy.NO_CACHE)
+                .into(image, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        getActivity().supportStartPostponedEnterTransition();
+                    }
+
+                    @Override
+                    public void onError() {
+                        getActivity().supportStartPostponedEnterTransition();
+                    }
+                });*/
 
         return rootView;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        postponeEnterTransition();
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //setupBackdropHeight();
-        new getMovieInfo(this).execute(anime.getAnimeLink());
+        if(anime.getSummary() == null) {
+            if(quality_list != null) quality_list.clear();
+            if(quality_name !=null) quality_name.clear();
+            task = new getMovieInfo(this).execute(anime.getAnimeLink());
+        } else {
+            summary.setText(anime.getSummary());
+        }
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,6 +189,14 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(task != null) {
+            task.cancel(true);
+        }
     }
 
     @Override
@@ -205,17 +257,5 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
             activity.get().summary.setText(activity.get().anime.getSummary());
             activity.get().quality_list = quality;
         }
-    }
-
-    private void setupBackdropHeight() {
-        CollapsingToolbarLayout.LayoutParams params = new CollapsingToolbarLayout.LayoutParams(MATCH_PARENT,
-                getBackdropHeight());
-        params.setCollapseMode(CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX);
-
-        image.setLayoutParams(params);
-    }
-
-    public int getBackdropHeight() {
-        return (int) (getResources().getDisplayMetrics().widthPixels / 1.5f);
     }
 }

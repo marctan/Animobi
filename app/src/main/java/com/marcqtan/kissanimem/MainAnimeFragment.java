@@ -51,6 +51,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     List<Anime> anime_list = null;
     EditText query;
     FrameLayout frame;
+    AsyncTask task = null;
 
     private CollapsingToolbarLayout collapsingToolbar;
     private AppBarLayout appBarLayout;
@@ -115,8 +116,16 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         }
 
         if(anime_list == null) {
-            new getAnimeList(this).execute(animeTrendingUrl);
+            task = new getAnimeList(this).execute(animeTrendingUrl);
         } else animeAdapter.setAnimeData(MainActivity.getCacheAnimeList());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(task != null) {
+            task.cancel(true);
+        }
     }
 
     @Override
