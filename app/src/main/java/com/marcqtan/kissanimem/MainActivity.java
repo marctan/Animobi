@@ -14,6 +14,8 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     MainAnimeFragment mainAnimeFragment = new MainAnimeFragment();
     SearchAnimeFragment searchAnimeFragment = new SearchAnimeFragment();
+    Fragment fragbeforeSearchClick = null;
+    Fragment fragbeforeHomeClick = null;
 
     static List<Anime> animeList = null;
 
@@ -61,11 +63,30 @@ public class MainActivity extends AppCompatActivity {
                                     ((MainAnimeFragment) currentFragment).scrolltoTop();
                                 }
                                 else {
-                                    switchFragment(mainAnimeFragment,"MainFrag");
+                                    if(!(currentFragment instanceof EpisodeListFragment)) {
+                                        fragbeforeHomeClick = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder);
+                                    }
+                                    if(fragbeforeSearchClick != null) {
+                                        switchFragment(fragbeforeSearchClick, "episodeList");
+                                    }
                                 }
                                 return true;
                             case R.id.menu_search:
-                                switchFragment(searchAnimeFragment, "searchFrag");
+                                if(getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder) instanceof MainAnimeFragment ||
+                                    getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder) instanceof EpisodeListFragment) {
+                                    fragbeforeSearchClick = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder);
+                                }
+
+                                if (fragbeforeHomeClick != null) {
+                                    switchFragment(fragbeforeHomeClick, "test2");
+                                    fragbeforeHomeClick = null;
+                                } else {
+                                    /*if(!(getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder) instanceof SearchAnimeFragment)) {
+                                        switchFragment(new SearchAnimeFragment(), "searchFrag");
+                                    }*/
+                                    switchFragment(searchAnimeFragment, "test2");
+                                    //getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, searchAnimeFragment, "test2").addToBackStack(null).commit();
+                                }
                                 return true;
                             case R.id.menu_notifications:
                                 //switchFragment(2, TAG_FRAGMENT_TRIPS);
@@ -85,5 +106,4 @@ public class MainActivity extends AppCompatActivity {
     private void switchFragment(Fragment fragment, String tag) {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, fragment, tag).commit();
     }
-
 }
