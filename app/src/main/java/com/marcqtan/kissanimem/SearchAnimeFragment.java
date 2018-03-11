@@ -49,7 +49,7 @@ public class SearchAnimeFragment extends Fragment {
                 bundle.putString("searchUrl", searchUrl);
 
                 searchFrag.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, searchFrag).addToBackStack(null).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragmentholder, searchFrag, "searchResult").addToBackStack("searchResult").commit();
             }
         });
     }

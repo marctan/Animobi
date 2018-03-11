@@ -92,7 +92,7 @@ public class SearchResultsFragment extends Fragment implements SearchListAdapter
 
             getActivity().getSupportFragmentManager().beginTransaction()
                     .addSharedElement(image,ViewCompat.getTransitionName(image))
-                    .replace(R.id.frame_fragmentholder, movieFrag).addToBackStack(null).commit();
+                    .replace(R.id.frame_fragmentholder, movieFrag, "movie").addToBackStack("movie").commit();
          } else {
             EpisodeListFragment episodeList = new EpisodeListFragment();
             Bundle bundle = new Bundle();
@@ -108,7 +108,7 @@ public class SearchResultsFragment extends Fragment implements SearchListAdapter
             getActivity().getSupportFragmentManager()
                     .beginTransaction().
                     addSharedElement(image, ViewCompat.getTransitionName(image)).
-                    replace(R.id.frame_fragmentholder, episodeList).addToBackStack(null).commit();
+                    replace(R.id.frame_fragmentholder, episodeList, "episodeList2").addToBackStack("episodeList2").commit();
         }
     }
 

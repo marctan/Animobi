@@ -231,7 +231,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         getActivity().getSupportFragmentManager()
                 .beginTransaction().
                 addSharedElement(image, ViewCompat.getTransitionName(image)).
-                replace(R.id.frame_fragmentholder, episodeList).addToBackStack(null).commit();
+                replace(R.id.frame_fragmentholder, episodeList, "episodeList").addToBackStack("episodeList").commit();
         //new Utility.getAnimeEpisode(this).execute(animeSelected);
     }
 

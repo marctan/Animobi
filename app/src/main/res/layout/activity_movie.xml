@@ -2,7 +2,8 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/movieLayout">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -41,7 +42,7 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -53,7 +54,7 @@
             android:paddingEnd="@dimen/activity_horizontal_margin"
             android:paddingStart="@dimen/activity_horizontal_margin"
             android:paddingTop="10dp"
-            android:text="testonly"
+            android:text="Summary"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
             android:textColor="#ffffff" />
     </android.support.v4.widget.NestedScrollView>

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
@@ -51,7 +52,9 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
     ImageView image;
     NestedScrollView scroll;
     CollapsingToolbarLayout test;
+    CoordinatorLayout movieLayout;
     AsyncTask task = null;
+    int color;
 
     @Nullable
     @Override
@@ -65,6 +68,7 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
         anime = (Anime) getArguments().getSerializable("anime");
         scroll = rootView.findViewById(R.id.scroll);
         test = rootView.findViewById(R.id.collapsing_toolbar);
+        movieLayout = rootView.findViewById(R.id.movieLayout);
 
         image.setTransitionName(getArguments().getString("transitionName"));
 
@@ -113,7 +117,7 @@ public class MovieFragment extends Fragment implements Utility.interface2 {
                         //                        int color = p.getDarkMutedColor(defaultColor);
                         //                        int color = p.getVibrantColor(defaultColor);
                         //                        int color = p.getLightVibrantColor(defaultColor);
-                        int color = p.getDarkVibrantColor(defaultColor);
+                        color = p.getDarkVibrantColor(defaultColor);
                         scroll.setBackgroundColor(color);
                         test.setContentScrimColor(color);
                     }
