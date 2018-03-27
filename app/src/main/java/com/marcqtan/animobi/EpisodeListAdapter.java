@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 /**
- * Created by Marc Q. Tan on 27/03/2018.
+ * Created by Marc Q. Tan on 26/10/2017.
  */
 
 public class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.EpisodeViewHolder> {

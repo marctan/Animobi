@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
- * Created by Marc Q. Tan on 27/03/2018.
+ * Created by Marc Q. Tan on 12/02/2018.
  */
 
 public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.ViewHolder> {

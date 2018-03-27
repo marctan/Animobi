@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Created by Marc Q. Tan on 27/03/2018.
+ * Created by Marc Q. Tan on 25/10/2017.
  */
 
 class Anime implements Serializable {
