@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 /**
- * Created by dell on 26/10/2017.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 public class EpisodeListAdapter extends RecyclerView.Adapter<EpisodeListAdapter.EpisodeViewHolder> {

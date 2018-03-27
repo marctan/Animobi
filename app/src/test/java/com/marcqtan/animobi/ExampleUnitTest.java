@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by dell on 27/03/2018.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 public class About extends Fragment {

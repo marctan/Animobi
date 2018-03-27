@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by dell on 18/02/2018.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnItemClicked, Utility.interface1  {

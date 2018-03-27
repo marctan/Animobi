@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by dell on 13/02/2018.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 final class Utility {

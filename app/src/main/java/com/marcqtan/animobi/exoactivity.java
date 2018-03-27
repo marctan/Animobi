@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
@@ -36,6 +36,10 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+
+/**
+ * Created by Marc Q. Tan on 27/03/2018.
+ */
 
 public class exoactivity extends AppCompatActivity implements ExoPlayer.EventListener {
     SimpleExoPlayer player;

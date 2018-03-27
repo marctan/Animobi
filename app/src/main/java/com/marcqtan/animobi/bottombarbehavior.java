@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.content.Context;
 import android.support.design.widget.BottomNavigationView;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 /**
- * Created by dell on 21/02/2018.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 public class bottombarbehavior extends CoordinatorLayout.Behavior<BottomNavigationView> {

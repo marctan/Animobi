@@ -1,11 +1,11 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Created by dell on 25/10/2017.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 class Anime implements Serializable {

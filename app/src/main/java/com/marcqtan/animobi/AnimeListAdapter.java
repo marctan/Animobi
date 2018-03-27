@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.content.Context;
 import android.support.v4.view.ViewCompat;
@@ -18,9 +18,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 /**
- * Created by Marc Q. Tan on 25/10/2017.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
-
 public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.AnimeViewHolder> {
 
     private List<Anime> animeLists;

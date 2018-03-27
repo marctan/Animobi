@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +24,10 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+/**
+ * Created by Marc Q. Tan on 27/03/2018.
+ */
 
 public class SearchResultsFragment extends Fragment implements SearchListAdapter.onItemClicked, Utility.interface1 {
 

@@ -1,7 +1,7 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 /**
- * Created by dell on 21/02/2018.
+ * Created by Marc Q. Tan on 27/03/2018.
  */
 
 import android.content.Context;

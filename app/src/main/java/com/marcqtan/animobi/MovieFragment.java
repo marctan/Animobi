@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.app.Activity;
 import android.content.Context;
@@ -39,6 +39,10 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Created by Marc Q. Tan on 27/03/2018.
+ */
 
 public class MovieFragment extends Fragment implements Utility.interface2 {
 

@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.util.List;
+
+/**
+ * Created by Marc Q. Tan on 27/03/2018.
+ */
 
 public class MainActivity extends AppCompatActivity {
 

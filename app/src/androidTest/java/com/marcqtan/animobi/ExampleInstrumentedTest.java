@@ -1,4 +1,4 @@
-package com.marcqtan.kissanimem;
+package com.marcqtan.animobi;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
