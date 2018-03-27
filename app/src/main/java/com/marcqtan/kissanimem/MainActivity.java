@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                                     ((MainAnimeFragment) currentFragment).scrolltoTop();
                                 }
                                 else {
-                                    if(!(currentFragment instanceof EpisodeListFragment) || (tag != null && tag.equals("episodeList2"))) {
+                                    if((!(currentFragment instanceof EpisodeListFragment) && !(currentFragment instanceof About)) || (tag != null && tag.equals("episodeList2"))) {
                                         fragbeforeHomeClick = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder);
                                     }
                                     if(fragbeforeSearchClick != null) {
@@ -86,13 +86,22 @@ public class MainActivity extends AppCompatActivity {
                                 if (fragbeforeHomeClick != null) {
                                     switchFragment(fragbeforeHomeClick, fragbeforeHomeClick.getTag());
                                     fragbeforeHomeClick = null;
-                                } else {
+                                } else if (!(getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder) instanceof About)) {
                                     getSupportFragmentManager().popBackStackImmediate("searchResult", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                    switchFragment(searchAnimeFragment, searchAnimeFragment.getTag());
+                                } else {
                                     switchFragment(searchAnimeFragment, searchAnimeFragment.getTag());
                                 }
                                 return true;
-                            case R.id.menu_notifications:
-                                //switchFragment(2, TAG_FRAGMENT_TRIPS);
+                            case R.id.menu_about:
+                                Fragment currFrag = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder);
+                                String tag1 = currFrag.getTag();
+                                if((!(currFrag instanceof EpisodeListFragment) && !(currFrag instanceof MainAnimeFragment)) || (tag1 != null && tag1.equals("episodeList2"))) {
+                                    fragbeforeHomeClick = currFrag;
+                                } else {
+                                    fragbeforeSearchClick = currFrag;
+                                }
+                                switchFragment(new About(), "about");
                                 return true;
                         }
                         return false;
@@ -116,10 +125,10 @@ public class MainActivity extends AppCompatActivity {
             String name = getSupportFragmentManager().getBackStackEntryAt
                     (getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
 
-            if(name.equals("episodeList") && bottomNavigationView.getSelectedItemId() == R.id.menu_search ) {
+            if(name.equals("episodeList") && (bottomNavigationView.getSelectedItemId() == R.id.menu_search || bottomNavigationView.getSelectedItemId() == R.id.menu_about) ) {
                 View view = bottomNavigationView.findViewById(R.id.menu_home);
                 view.performClick();
-            } else if ((name.equals("searchResult") || name.equals("episodeList2") || name.equals("movie")) && bottomNavigationView.getSelectedItemId() == R.id.menu_home) {
+            } else if ((name.equals("searchResult") || name.equals("episodeList2") || name.equals("movie")) && (bottomNavigationView.getSelectedItemId() == R.id.menu_home || bottomNavigationView.getSelectedItemId() == R.id.menu_about)) {
                 View view = bottomNavigationView.findViewById(R.id.menu_search);
                 view.performClick();
             } else {
