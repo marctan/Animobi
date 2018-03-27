@@ -149,7 +149,7 @@ final class Utility {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            activity.get().progress.setVisibility(View.VISIBLE);
+            activity.get().frame.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -177,7 +177,7 @@ final class Utility {
         protected void onPostExecute(Anime anime) {
             super.onPostExecute(anime);
             //i.hideVisibility();
-            activity.get().progress.setVisibility(View.GONE);
+            activity.get().frame.setVisibility(View.GONE);
             if(anime.retrieveEpisodes() == null) {
                 Log.v("getAnimeEpisode()", "ERROR on postExecute!!!");
                 return;

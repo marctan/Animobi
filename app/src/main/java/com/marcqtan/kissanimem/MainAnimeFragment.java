@@ -114,10 +114,6 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
         } else if (MainActivity.getCacheAnimeList() != null) {
             anime_list = MainActivity.getCacheAnimeList();
         }
-
-        if(anime_list == null) {
-            task = new getAnimeList(this).execute(animeTrendingUrl);
-        } else animeAdapter.setAnimeData(MainActivity.getCacheAnimeList());
     }
 
     @Override
@@ -136,6 +132,17 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     @Override
     public void hideVisibility() {
         frame.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if(anime_list == null) {
+            task = new getAnimeList(this).execute(animeTrendingUrl);
+        } else {
+            animeAdapter.setAnimeData(MainActivity.getCacheAnimeList());
+        }
     }
 
     @Override
@@ -193,7 +200,9 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
             } else {
                 Log.v("ERROR HERE", "ERROR!!!");
             }
+
             activity.get().frame.setVisibility(View.GONE);
+
             MainActivity.cacheAnimeList(activity.get().anime_list);
         }
     }
@@ -238,5 +247,7 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
     public void scrolltoTop(){
         animelist.smoothScrollToPosition(0);
     }
+
+
 
 }

@@ -7,9 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -23,7 +26,6 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
     private List<Anime> animeLists;
     private OnItemClicked mListener;
     private Context mContext;
-
 
     public interface OnItemClicked {
         void onItemClick(int position, ImageView v);
@@ -43,8 +45,9 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
     }
 
     @Override
-    public void onBindViewHolder(AnimeViewHolder holder, int position) {
-        Anime anime = animeLists.get(position);
+    public void onBindViewHolder(final AnimeViewHolder holder, final int position) {
+        //setScaleAnimation(holder.itemView);
+        final Anime anime = animeLists.get(position);
         holder.tvAnimeName.setText(anime.getAnimeName());
         holder.tvEpisodeCount.setText(anime.getEpisodeCount());
         //Glide.with(mContext).load(anime.getAnimeThumbnail()).into(holder.thumbNail);
@@ -52,7 +55,20 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
 
         Picasso.with(mContext)
                 .load(anime.getAnimeThumbnail())
-                .into(holder.thumbNail);
+                .into(holder.thumbNail, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.tvAnimeName.setVisibility(View.VISIBLE);
+                        holder.tvEpisodeCount.setVisibility(View.VISIBLE);
+                        holder.thumbNail.setVisibility(View.VISIBLE);
+                        setScaleAnimation(holder.itemView,position);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
         ViewCompat.setTransitionName(holder.thumbNail, anime.getAnimeName());
 
@@ -69,6 +85,16 @@ public class AnimeListAdapter extends RecyclerView.Adapter<AnimeListAdapter.Anim
                 listener.onCardSelected(position, holder.thumbnail);
             }
         });*/
+    }
+
+    private void setScaleAnimation(View view, int position) {
+        if (position >= animeLists.size()) {
+            return;
+        }
+
+        Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.item_animation_fall_down);
+        view.animate().setStartDelay(300);
+        view.startAnimation(animation);
     }
 
     @Override

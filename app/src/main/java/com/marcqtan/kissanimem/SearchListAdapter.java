@@ -6,9 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,7 +25,6 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
     private List<Anime> anime_list = null;
     private Context m_context;
     private onItemClicked m_listener;
-
     public interface onItemClicked {
         void itemClick(int position, ImageView image);
     }
@@ -33,13 +35,26 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(SearchListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final SearchListAdapter.ViewHolder holder, final int position) {
         Anime anime = anime_list.get(position);
         holder.title.setText(anime.getAnimeName());
         holder.epcount.setText(anime.getEpisodeCount());
         Picasso.with(m_context)
                 .load(anime.getAnimeThumbnail())
-                .into(holder.thumbnail);
+                .into(holder.thumbnail, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.title.setVisibility(View.VISIBLE);
+                        holder.epcount.setVisibility(View.VISIBLE);
+                        holder.thumbnail.setVisibility(View.VISIBLE);
+                        setAnimation(holder.itemView, position);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
         ViewCompat.setTransitionName(holder.thumbnail, anime.getAnimeName());
     }
 
@@ -49,6 +64,16 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Vi
             return 0;
         }
         return anime_list.size();
+    }
+
+    private void setAnimation(View view, int position) {
+        if (position >= anime_list.size()) {
+            return;
+        }
+
+        Animation animation = AnimationUtils.loadAnimation(m_context, R.anim.item_animation_fall_down);
+        view.animate().setStartDelay(300);
+        view.startAnimation(animation);
     }
 
     SearchListAdapter(Context m_context, onItemClicked m_listener) {

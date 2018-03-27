@@ -56,14 +56,21 @@ public class SearchResultsFragment extends Fragment implements SearchListAdapter
         return rootView;
     }
 
+
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         if(animeLists != null && animeLists.size() > 0) {
             adapter.setData(animeLists);
         } else {
             task = new searchAnime(this).execute(getArguments().getString("searchUrl"));
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -161,8 +168,8 @@ public class SearchResultsFragment extends Fragment implements SearchListAdapter
                 activity.get().rv.setVisibility(View.GONE);
                 activity.get().empty.setVisibility(View.VISIBLE);
             }  else if (activity.get().animeLists.size() > 0){
-                activity.get().rv.setVisibility(View.VISIBLE);
-                activity.get().empty.setVisibility(View.GONE);
+                //activity.get().rv.setVisibility(View.VISIBLE);
+                //activity.get().empty.setVisibility(View.GONE);
                 activity.get().adapter.setData(activity.get().animeLists);
             }
             activity.get().frame.setVisibility(View.GONE);

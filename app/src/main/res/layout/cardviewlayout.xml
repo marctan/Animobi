@@ -17,6 +17,7 @@
                 android:id="@+id/thumbnail"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
+                android:visibility="gone"
                 android:scaleType="centerCrop" />
 
             <TextView
@@ -27,6 +28,7 @@
                 android:paddingLeft="@dimen/album_title_padding"
                 android:paddingRight="@dimen/album_title_padding"
                 android:paddingTop="@dimen/album_title_padding"
+                android:visibility="gone"
                 android:textColor="@color/album_title"
                 android:textSize="@dimen/album_title"
                 android:text="Test Title"/>
@@ -38,6 +40,7 @@
                 android:layout_below="@id/anime_name"
                 android:paddingBottom="@dimen/songs_count_padding_bottom"
                 android:paddingLeft="@dimen/album_title_padding"
+                android:visibility="gone"
                 android:paddingRight="@dimen/album_title_padding"
                 android:textSize="@dimen/songs_count"
                 android:text="Episode Count"/>
