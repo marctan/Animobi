@@ -83,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 return true;
                             case R.id.menu_search:
-                                if(getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder) instanceof EpisodeListFragment) {
+                                String strTag = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder).getTag();
+                                if(getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder) instanceof EpisodeListFragment && ((strTag != null ) && !strTag.equals("episodeList2"))) {
                                     fragbeforeSearchClick = getSupportFragmentManager().findFragmentById(R.id.frame_fragmentholder);
                                 }
 
