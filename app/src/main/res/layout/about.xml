@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/testcover"
+        android:layout_marginBottom="10dp"/>
 
     <TextView
-        android:id="@+id/searchET"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Marc Tan"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:autoLink="web"
+        android:textSize="16sp"
+        android:layout_below="@+id/imageView"
+        android:text="COPYRIGHT © 2018 Marc Q. Tan\nAll Rights Reserved\nhttps://marcqtan.com"
         />
 
-</LinearLayout>
+
+</RelativeLayout>
