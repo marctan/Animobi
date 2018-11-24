@@ -11,6 +11,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -241,9 +242,21 @@ final class Utility {
             }
 
             for (Element x : a) {
-                quality.add(x.select("a[href]").attr("href"));
-                quality_name.add(x.text());
+                if(x.text().length() > 0) {
+                    String val = Character.toString(x.text().charAt(0));
+                    if (TextUtils.isDigitsOnly(val)) {
+                        quality.add(x.select("a[href]").attr("href"));
+                        quality_name.add(x.text());
+                    }
+                }
             }
+
+            if(quality.size() == 1) {
+                List<String> directLink = new ArrayList<>();
+                directLink.add(doc3.select("video#videojs").select("source[src]").attr("src"));
+                return directLink;
+            }
+
             return quality;
 
         } catch (IOException e) {

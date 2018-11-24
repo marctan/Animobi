@@ -12,6 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ems="30"
+        android:maxLines="1"
+        android:singleLine="true"
         />
 
     <Button
