@@ -215,7 +215,13 @@ public class MainAnimeFragment extends Fragment implements AnimeListAdapter.OnIt
             anime.setAnimeName(hrefInfo.text());
             anime.setAnimeLink(hrefInfo.select("a").attr("href"));
             anime.setThumbNail(info.select("img").attr("src"));
-            anime.setEpisodeCount(info.select("span.ep-no").text()); //TODO
+            Elements ep = info.select("div.some-more-info").select("tr+tr+tr").first().select("td");
+            String epCount = "";
+            if (ep.first().text().equals("Episodes :")){
+                epCount = ep.last().text();
+                epCount = epCount.equals("?") ? "Ongoing" : "Episodes: " + epCount;
+            }
+            anime.setEpisodeCount(epCount); //TODO
             anime_list.add(anime);
         }
     }

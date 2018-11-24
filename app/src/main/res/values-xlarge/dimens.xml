@@ -3,4 +3,6 @@
     <dimen name="about_image_height">700dp</dimen>
     <dimen name="banner_image_height">578dp</dimen>
     <dimen name="movie_image_height">700dp</dimen>
+    <dimen name="collapsing_image_height">400dp</dimen>
+    <dimen name="thumbnail_image_height">300dp</dimen>
 </resources>

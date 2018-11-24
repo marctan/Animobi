@@ -46,6 +46,7 @@
         app:itemIconTint="@drawable/selector_bottombar_item"
         app:itemTextColor="@drawable/selector_bottombar_item"
         app:menu="@menu/bottom_nav_items"
+        android:background="@color/bottombar"
         />
 
 </FrameLayout>

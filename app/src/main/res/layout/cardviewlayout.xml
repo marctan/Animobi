@@ -16,7 +16,7 @@
             <ImageView
                 android:id="@+id/thumbnail"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="@dimen/thumbnail_image_height"
                 android:visibility="gone"
                 android:scaleType="centerCrop" />
 
