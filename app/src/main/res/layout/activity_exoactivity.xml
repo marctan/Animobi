@@ -7,8 +7,7 @@
         android:id="@+id/player_view"
         android:focusable="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#D8000000"/>
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:id="@+id/relativelayout_progress"

@@ -2,6 +2,7 @@ package com.marcqtan.animobi;
 
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -72,6 +73,7 @@ public class exoactivity extends AppCompatActivity implements ExoPlayer.EventLis
         SimpleExoPlayerView playerView = findViewById(R.id.player_view);
         playerView.setPlayer(player);
         playerView.setKeepScreenOn(true);
+        playerView.setBackgroundColor(Color.BLACK);
         playerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
             @Override
             public void onVisibilityChange(int visibility) {
