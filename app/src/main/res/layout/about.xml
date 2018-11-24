@@ -8,12 +8,13 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="@dimen/about_image_height"
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/testcover"
         android:layout_marginBottom="10dp"/>
 
     <TextView
+        android:id="@+id/copyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -24,6 +25,17 @@
         android:layout_below="@+id/imageView"
         android:text="COPYRIGHT © 2018 Marc Q. Tan\nAll Rights Reserved\nhttps://marcqtan.com"
         />
+    <TextView
+        android:id="@+id/email"
+        android:layout_below="@+id/copyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email: marcqtan@gmail.com"
+        android:textSize="16sp"
+        android:autoLink="email"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
 
 
 </RelativeLayout>

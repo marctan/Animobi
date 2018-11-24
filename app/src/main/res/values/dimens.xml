@@ -17,4 +17,7 @@
     <dimen name="ic_album_overflow_width">20dp</dimen>
     <dimen name="ic_album_overflow_height">30dp</dimen>
     <dimen name="ic_album_overflow_margin_top">10dp</dimen>
+    <dimen name="about_image_height">400dp</dimen>
+    <dimen name="banner_image_height">378dp</dimen>
+    <dimen name="movie_image_height">450dp</dimen>
 </resources>
