@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/about_image_height"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/cover"
         android:layout_marginBottom="10dp"/>
 
     <TextView
