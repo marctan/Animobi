@@ -14,6 +14,8 @@
         android:ems="30"
         android:maxLines="1"
         android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
         />
 
     <Button

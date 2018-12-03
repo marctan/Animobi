@@ -1,6 +1,7 @@
 package com.marcqtan.animobi;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,6 +38,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Marc Q. Tan on 27/03/2018.
@@ -201,7 +204,7 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
     }
 
 
-    static class getAnimeVideo extends AsyncTask<String, Void, List<String>> {
+    static class getAnimeVideo extends AsyncTask<String, Void, EpisodeWrapper> {
         List<String> quality_name = new ArrayList<String>();
 
         private WeakReference<EpisodeListFragment> activity;
@@ -217,12 +220,18 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
         }
 
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected EpisodeWrapper doInBackground(String... params) {
             try {
                 Document doc = Jsoup.connect(params[0]).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
                         .followRedirects(true)
                         .get();
-                return Utility.getQuality(doc, quality_name);
+
+                List<String> qualityList = Utility.getQuality(doc, quality_name);
+                EpisodeWrapper ew = new EpisodeWrapper();
+                ew.qualityList = qualityList;
+                ew.doc = doc;
+
+                return ew;
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.v("getAnimeEpisode()", "Error accessing link");
@@ -231,14 +240,129 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
         }
 
         @Override
-        protected void onPostExecute(final List<String> quality) {
-            super.onPostExecute(quality);
+        protected void onPostExecute(EpisodeWrapper ew) {
+            super.onPostExecute(ew);
             activity.get().frame.setVisibility(View.GONE);
 
-            if(quality == null) {
+            if(ew.qualityList == null) { //Try fetching from another source
+                new getVidAnotherSource(activity.get()).execute(ew.doc);
+            } else if (ew.qualityList.size() == 1) {
+
+                if(activity.get().getActivity() == null) {
+                    return;
+                }
+
+                Intent i = new Intent(activity.get().getActivity(), exoactivity.class);
+                i.putExtra("vidurl", ew.qualityList.get(0));
+                i.putExtra("animeName", activity.get().anime.getAnimeName());
+                activity.get().startActivity(i);
+
+            } else {
+                Utility.showBottomSheet(activity.get(), ew.qualityList, quality_name, activity.get().anime.getAnimeName());
+            }
+        }
+    }
+
+    static class getVidAnotherSource extends AsyncTask<Document, Void, String> {
+        private WeakReference<EpisodeListFragment> activity;
+        ProgressDialog progressDialog;
+
+        getVidAnotherSource(EpisodeListFragment activity) {
+            this.activity = new WeakReference<EpisodeListFragment>(activity);
+            progressDialog = new ProgressDialog(activity.getContext());
+            progressDialog.setTitle("No available video stream");
+            progressDialog.setMessage("Fetching from other sources...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCancelable(false);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.show();
+            //activity.get().frame.setVisibility(View.VISIBLE);
+            //fetching dialog progress;
+        }
+
+        @Override
+        protected String doInBackground(Document... params) {
+            try {
+                String vidLink = null;
+                String javascript = params[0].getElementsByClass("video-wrap").get(0).select("script").html();
+
+                if(!javascript.equals("")) {
+                    String lineWithoutSpaces = javascript.replaceAll("\\s+", ""); //remove whitespace
+
+                    Pattern p = Pattern.compile("\"([^\"]*)\""); //get everything inside a quotation.
+                    Matcher m = p.matcher(lineWithoutSpaces);
+
+                    String vidLoxtmpLink = null;
+
+                    while (m.find()) {
+                        if (m.group(1).equals("Vidlox")) {
+                            if (m.find()) {
+                                vidLoxtmpLink = m.group(1); //get vidLox link
+                                break;
+                            }
+                        }
+                    }
+
+                    if(vidLoxtmpLink != null) {
+                        String url = "https://otakustream.tv" + vidLoxtmpLink;
+
+                        Document doc2 = Jsoup.connect(url).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
+                                .followRedirects(true)
+                                .get();
+
+                        String vidLoxEmbedLink = doc2.select("iframe").attr("src");
+
+                        Document doc3 = Jsoup.connect(vidLoxEmbedLink).timeout(30000).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.50")
+                                .followRedirects(true)
+                                .get();
+
+                        String script = doc3.select("script").last().html(); //the last javascript has the vidLox directLink;
+                        String scriptnospaces = script.replaceAll("\\s+", ""); //remove whitespace
+
+                        Pattern p2 = Pattern.compile("^https.*\\.mp4$"); //match strings that start with http and ends with mp4
+
+                        Matcher m2 = p.matcher(scriptnospaces);
+                        Matcher m3;
+
+                        String vidLoxDirectLink = "";
+
+                        while (m2.find()) {
+                            m3 = p2.matcher(m2.group(1));
+                            if (m3.find()) {
+                                vidLoxDirectLink = m3.group(0); // get the vidLox direct link
+                                break;
+                            }
+                        }
+                        if (!vidLoxDirectLink.equals("")) {
+                            vidLink = vidLoxDirectLink;
+                        }
+                    }
+                }
+
+                return vidLink;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.v("getVidAnotherSource()", "Error accessing link");
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String vidUrl) {
+            super.onPostExecute(vidUrl);
+            progressDialog.dismiss();
+            //activity.get().frame.setVisibility(View.GONE);
+            //remove progressdialog
+
+            if(vidUrl == null) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(activity.get().getActivity());
                 adb.setTitle("No available video stream");
-                adb.setMessage("Sorry");
+                adb.setMessage(":(");
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -249,19 +373,16 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
                 ad.show();
 
                 Log.v("Error", "Error fetching video quality url");
-            } else if (quality.size() == 1) {
-
+            } else {
                 if(activity.get().getActivity() == null) {
                     return;
                 }
 
                 Intent i = new Intent(activity.get().getActivity(), exoactivity.class);
-                i.putExtra("vidurl", quality.get(0));
+                i.putExtra("vidurl", vidUrl);
                 i.putExtra("animeName", activity.get().anime.getAnimeName());
                 activity.get().startActivity(i);
 
-            } else {
-                Utility.showBottomSheet(activity.get(), quality, quality_name, activity.get().anime.getAnimeName());
             }
         }
     }
