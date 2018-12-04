@@ -244,7 +244,7 @@ public class EpisodeListFragment extends Fragment implements EpisodeListAdapter.
             super.onPostExecute(ew);
             activity.get().frame.setVisibility(View.GONE);
 
-            if(ew.qualityList == null) { //Try fetching from another source
+            if(ew.qualityList == null || ew.qualityList.size() == 0) { //Try fetching from another source
                 new getVidAnotherSource(activity.get()).execute(ew.doc);
             } else if (ew.qualityList.size() == 1) {
 
