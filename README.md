@@ -1,6 +1,6 @@
-# Animobi
+# Animobi - Created by scraping otakustream.tv/gogoanime.io
 Animobi - Watch your favorite anime on mobile! (android)
-Created by scraping otakustream.tv/gogoanime.io
+
 
 
 This is not maintained anymore and was removed by Google in Play Store due to copyright of images and link.
